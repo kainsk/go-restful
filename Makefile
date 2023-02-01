@@ -10,4 +10,4 @@ pqdown:
 	migrate -database "$(DB_URL)" -path db/postgres/schemas down $(n)
 
 pqclean:
-	migrate -database "$(DB_URL)" -path db/migrations drop -f
+	migrate -database "$(DB_URL)" -path db/postgres/schemas drop -f

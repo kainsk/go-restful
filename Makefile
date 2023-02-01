@@ -1,2 +1,13 @@
+DB_URL=postgres://postgres:ligmaballs@localhost:5432/sqlc_project?sslmode=disable
+
 pqcreate:
 	migrate create -ext sql  -dir db/postgres/schemas -seq $(name)
+
+pqup:
+	migrate -database "$(DB_URL)" -path db/postgres/schemas up $(n)
+
+pqdown:
+	migrate -database "$(DB_URL)" -path db/postgres/schemas down $(n)
+
+pqclean:
+	migrate -database "$(DB_URL)" -path db/migrations drop -f

@@ -9,8 +9,8 @@ type BindUriID struct {
 }
 
 type ListProductsRequest struct {
-	Offset int32 `json:"offset" binding:"number,min=0"`
-	Limit  int32 `json:"limit" binding:"number,min=1"`
+	Page    int32 `form:"page,default=1" binding:"number,min=1"`
+	PerPage int32 `form:"per_page,default=25" binding:"number,min=1,max=50"`
 }
 
 type UpdateProductRequest struct {

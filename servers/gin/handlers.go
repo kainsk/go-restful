@@ -80,14 +80,14 @@ func (gs *GinServer) GetProduct(c *gin.Context) {
 
 func (gs *GinServer) ListProducts(c *gin.Context) {
 	var req requests.ListProductsRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindQuery(&req); err != nil {
 		c.JSON(500, gin.H{
 			"message": err.Error(),
 		})
 		return
 	}
 
-	prods, err := gs.Service.ListProducts(c, req)
+	prods, pagination, err := gs.Service.ListProducts(c, req)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": err.Error(),
@@ -96,7 +96,8 @@ func (gs *GinServer) ListProducts(c *gin.Context) {
 	}
 
 	data := gin.H{
-		"products": prods,
+		"products":   prods,
+		"pagination": pagination,
 	}
 
 	resp := helpers.SuccessResponse("list products successfully", data)

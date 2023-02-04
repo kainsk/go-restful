@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"sqlc-rest-api/db/postgres/repositories"
+	"sqlc-rest-api/helpers"
 	"sqlc-rest-api/requests"
 	"sqlc-rest-api/responses"
 )
@@ -54,15 +55,20 @@ func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriI
 	}, nil
 }
 
-func (pq *PostgresService) ListProducts(ctx context.Context, req requests.ListProductsRequest) ([]responses.ProductResponse, error) {
+func (pq *PostgresService) ListProducts(ctx context.Context, req requests.ListProductsRequest) ([]responses.ProductResponse, *responses.Pagination, error) {
+	countProds, err := pq.Repo.CountProducts(ctx, pq.DB)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	arg := repositories.ListProductsParams{
-		Offset: req.Offset,
-		Limit:  req.Limit,
+		Offset: (req.Page - 1) * req.PerPage,
+		Limit:  req.PerPage,
 	}
 
 	prods, err := pq.Repo.ListProducts(ctx, pq.DB, arg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var products []responses.ProductResponse
@@ -75,7 +81,15 @@ func (pq *PostgresService) ListProducts(ctx context.Context, req requests.ListPr
 		products = append(products, p)
 	}
 
-	return products, nil
+	pagination := helpers.Paginate(
+		int32(countProds),
+		int32(len(products)),
+		req.Page,
+		req.PerPage,
+		"/products",
+	)
+
+	return products, pagination, nil
 }
 
 func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (responses.ProductResponse, error) {

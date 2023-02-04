@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	CountProducts(ctx context.Context, db DBTX) (int64, error)
 	CreateProduct(ctx context.Context, db DBTX, productName string) (Product, error)
 	DeleteProduct(ctx context.Context, db DBTX, productID int64) error
 	GetProduct(ctx context.Context, db DBTX, productID int64) (Product, error)

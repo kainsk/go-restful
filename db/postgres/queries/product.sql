@@ -25,3 +25,6 @@ RETURNING *;
 -- name: DeleteProduct :exec
 DELETE FROM products
 WHERE id = sqlc.arg('product_id');
+
+-- name: CountProducts :one
+SELECT COUNT(*) FROM products;

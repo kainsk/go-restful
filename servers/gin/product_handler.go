@@ -10,7 +10,7 @@ import (
 func (gs *GinServer) CreateProduct(c *gin.Context) {
 	var req requests.CreateProductRequest
 	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(400, gin.H{
 			"message": err.Error(),
 		})
 		return
@@ -35,7 +35,7 @@ func (gs *GinServer) CreateProduct(c *gin.Context) {
 func (gs *GinServer) DeleteProduct(c *gin.Context) {
 	var req requests.BindUriID
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(400, gin.H{
 			"message": err.Error(),
 		})
 		return
@@ -56,7 +56,7 @@ func (gs *GinServer) DeleteProduct(c *gin.Context) {
 func (gs *GinServer) GetProduct(c *gin.Context) {
 	var req requests.BindUriID
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(400, gin.H{
 			"message": err.Error(),
 		})
 		return
@@ -81,7 +81,7 @@ func (gs *GinServer) GetProduct(c *gin.Context) {
 func (gs *GinServer) ListProducts(c *gin.Context) {
 	var req requests.ListProductsRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(400, gin.H{
 			"message": err.Error(),
 		})
 		return
@@ -109,14 +109,14 @@ func (gs *GinServer) UpdateProduct(c *gin.Context) {
 	var uri requests.BindUriID
 
 	if err := c.ShouldBindUri(&uri); err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(400, gin.H{
 			"message": err.Error(),
 		})
 		return
 	}
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(500, gin.H{
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(400, gin.H{
 			"message": err.Error(),
 		})
 		return

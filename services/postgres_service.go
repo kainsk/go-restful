@@ -15,9 +15,9 @@ type PostgresService struct {
 	DB   *sql.DB
 }
 
-func NewPostgresService(db *sql.DB) *PostgresService {
+func NewPostgresService(db *sql.DB, pqrepo repositories.Querier) *PostgresService {
 	return &PostgresService{
-		Repo: repositories.New(),
+		Repo: pqrepo,
 		DB:   db,
 	}
 }

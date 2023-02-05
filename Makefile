@@ -11,3 +11,6 @@ pqdown:
 
 pqclean:
 	migrate -database "$(DB_URL)" -path db/postgres/schemas drop -f
+
+pqmock:
+	mockgen -package mocks -destination mocks/service_mock.go -source services/service.go Service

@@ -3,6 +3,7 @@ package main
 import (
 	"sqlc-rest-api/config"
 	"sqlc-rest-api/db/drivers"
+	"sqlc-rest-api/db/postgres/repositories"
 	"sqlc-rest-api/services"
 
 	gs "sqlc-rest-api/servers/gin"
@@ -23,7 +24,8 @@ func main() {
 		logger.Fatal("Failed to connect database :", err)
 	}
 
-	service := services.NewPostgresService(db)
+	pqRepo := repositories.New()
+	service := services.NewPostgresService(db, pqRepo)
 	ginserver, err := gs.NewGinServer(service, env)
 	if err != nil {
 		logger.Fatal("Failed to create server :", err)

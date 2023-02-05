@@ -132,7 +132,7 @@ func (gs *GinServer) UpdateProduct(c *gin.Context) {
 	}
 
 	data := gin.H{
-		"products": prod,
+		"product": prod,
 	}
 
 	resp := helpers.SuccessResponse("update product successfully", data)

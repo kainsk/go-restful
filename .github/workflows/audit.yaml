@@ -28,9 +28,44 @@ jobs:
             --health-retries 5
 
       steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Run staticcheck
+        run: staticcheck ./...
+
+      - name: Install golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Run golint
+        run: golint ./...
+
       - name: create environment file
         run: |
-          pwd
           touch app.env
           echo "${{ secrets.APP_ENV }}" > app.env
-          cat app.env
+
+      - name: Install golang migrate
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
+          sudo mv migrate /usr/bin/
+          which migrate
+
+      - name: run postgres database migration
+        run: migrate -database postgres://postgres:test@localhost:5432/go_restful_test?sslmode=disable -path db/postgres/schemas up
+
+      - name: run tests
+        run:
+          go test ./servers/gin -v -cover
+          go test ./db/postgres/repositories/ -v -cover

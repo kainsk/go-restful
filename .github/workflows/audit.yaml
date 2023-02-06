@@ -1,0 +1,36 @@
+name: Audit
+
+on:
+  push:
+    branches: [master]
+  pull_request: 
+    branches: [master]
+
+jobs:
+
+    audit:
+      runs-on: ubuntu-latest
+
+      services:
+        postgres:
+          image: postgres:12
+          env:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: test
+            POSTGRES_DB: go_restful_test
+            POSTGRES_PORT: 5432
+          ports:
+            - 5432:5432
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+
+      steps:
+      - name: create environment file
+        run: |
+          pwd
+          touch app.env
+          echo "${{ secrets.APP_ENV }}" > app.env
+          cat app.env

@@ -9,12 +9,13 @@ import (
 	"context"
 )
 
-const countProducts = `-- name: CountProducts :one
+const countProductsByUserID = `-- name: CountProductsByUserID :one
 SELECT COUNT(*) FROM products
+WHERE user_id = $1
 `
 
-func (q *Queries) CountProducts(ctx context.Context, db DBTX) (int64, error) {
-	row := db.QueryRowContext(ctx, countProducts)
+func (q *Queries) CountProductsByUserID(ctx context.Context, db DBTX, userID int64) (int64, error) {
+	row := db.QueryRowContext(ctx, countProductsByUserID, userID)
 	var count int64
 	err := row.Scan(&count)
 	return count, err

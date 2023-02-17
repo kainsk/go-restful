@@ -31,5 +31,6 @@ RETURNING *;
 DELETE FROM products
 WHERE id = $1;
 
--- name: CountProducts :one
-SELECT COUNT(*) FROM products;
+-- name: CountProductsByUserID :one
+SELECT COUNT(*) FROM products
+WHERE user_id = $1;

@@ -23,14 +23,23 @@ func NewPostgresService(db *sql.DB, pqrepo repositories.Querier) *PostgresServic
 }
 
 func (pq *PostgresService) CreateProduct(ctx context.Context, req requests.CreateProductRequest) (responses.ProductResponse, error) {
-	prod, err := pq.Repo.CreateProduct(ctx, pq.DB, req.Name)
+	arg := repositories.CreateProductParams{
+		UserID: req.UserID,
+		Name:   req.Name,
+		Price:  req.Price,
+	}
+
+	prod, err := pq.Repo.CreateProduct(ctx, pq.DB, arg)
 	if err != nil {
 		return responses.ProductResponse{}, err
 	}
 
 	return responses.ProductResponse{
-		ID:   prod.ID,
-		Name: prod.Name,
+		ID:        prod.ID,
+		Name:      prod.Name,
+		Price:     prod.Price,
+		UserID:    prod.UserID,
+		CreatedAt: prod.CreatedAt.Time,
 	}, nil
 }
 
@@ -50,13 +59,16 @@ func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriI
 	}
 
 	return responses.ProductResponse{
-		ID:   prod.ID,
-		Name: prod.Name,
+		ID:        prod.ID,
+		Name:      prod.Name,
+		Price:     prod.Price,
+		UserID:    prod.UserID,
+		CreatedAt: prod.CreatedAt.Time,
 	}, nil
 }
 
-func (pq *PostgresService) ListProducts(ctx context.Context, req requests.ListProductsRequest) ([]responses.ProductResponse, *responses.Pagination, error) {
-	countProds, err := pq.Repo.CountProducts(ctx, pq.DB)
+func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) ([]responses.ProductResponse, *responses.Pagination, error) {
+	countProds, err := pq.Repo.CountProductsByUserID(ctx, pq.DB, req.UserID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -64,6 +76,7 @@ func (pq *PostgresService) ListProducts(ctx context.Context, req requests.ListPr
 	arg := repositories.ListProductsParams{
 		Offset: (req.Page - 1) * req.PerPage,
 		Limit:  req.PerPage,
+		UserID: req.UserID,
 	}
 
 	prods, err := pq.Repo.ListProducts(ctx, pq.DB, arg)
@@ -74,8 +87,11 @@ func (pq *PostgresService) ListProducts(ctx context.Context, req requests.ListPr
 	var products []responses.ProductResponse
 	for _, prod := range prods {
 		p := responses.ProductResponse{
-			ID:   prod.ID,
-			Name: prod.Name,
+			ID:        prod.ID,
+			Name:      prod.Name,
+			Price:     prod.Price,
+			UserID:    prod.UserID,
+			CreatedAt: prod.CreatedAt.Time,
 		}
 
 		products = append(products, p)
@@ -99,8 +115,9 @@ func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.Updat
 	}
 
 	arg := repositories.UpdateProductParams{
-		ProductID:      prod.ID,
-		NewProductName: req.Name,
+		ID:    prod.ID,
+		Name:  req.Name,
+		Price: req.Price,
 	}
 
 	updated, err := pq.Repo.UpdateProduct(ctx, pq.DB, arg)
@@ -109,7 +126,43 @@ func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.Updat
 	}
 
 	return responses.ProductResponse{
-		ID:   updated.ID,
-		Name: updated.Name,
+		ID:        updated.ID,
+		Name:      updated.Name,
+		Price:     updated.Price,
+		UserID:    updated.UserID,
+		CreatedAt: updated.CreatedAt.Time,
+	}, nil
+}
+
+func (pq *PostgresService) CreateUser(ctx context.Context, req requests.CreateUserRequest) (responses.User, error) {
+	arg := repositories.CreateUserParams{
+		Name:  req.Name,
+		Email: req.Email,
+	}
+
+	user, err := pq.Repo.CreateUser(ctx, pq.DB, arg)
+	if err != nil {
+		return responses.User{}, err
+	}
+
+	return responses.User{
+		ID:        user.ID,
+		Name:      user.Name,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt.Time,
+	}, nil
+}
+
+func (pq *PostgresService) GetUser(ctx context.Context, req requests.BindUriID) (responses.User, error) {
+	user, err := pq.Repo.GetUser(ctx, pq.DB, req.ID)
+	if err != nil {
+		return responses.User{}, err
+	}
+
+	return responses.User{
+		ID:        user.ID,
+		Name:      user.Name,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt.Time,
 	}, nil
 }

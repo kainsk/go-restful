@@ -1,30 +1,35 @@
 -- name: ListProducts :many
 SELECT * FROM products
+WHERE user_id = $1
 ORDER BY id
-LIMIT sqlc.arg('limit')
-OFFSET sqlc.arg('offset');
+LIMIT $2
+OFFSET $3;
 
 -- name: CreateProduct :one
 INSERT INTO products(
-    name
+    user_id,
+    name,
+    price
 ) VALUES (
-    sqlc.arg('product_name')
+    $1, $2, $3
 ) RETURNING *;
 
 -- name: GetProduct :one
 SELECT * FROM products
-WHERE id = sqlc.arg('product_id')
+WHERE id = $1
 LIMIT 1;
 
 -- name: UpdateProduct :one
 UPDATE products
-SET name = sqlc.arg('new_product_name')
-WHERE id = sqlc.arg('product_id')
+SET
+    name = $2,
+    price = $3
+WHERE id = $1
 RETURNING *;
 
 -- name: DeleteProduct :exec
 DELETE FROM products
-WHERE id = sqlc.arg('product_id');
+WHERE id = $1;
 
 -- name: CountProducts :one
 SELECT COUNT(*) FROM products;

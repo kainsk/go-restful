@@ -21,13 +21,15 @@ func TestGetProduct(t *testing.T) {
 
 	require.Equal(t, prod.ID, getProd.ID)
 	require.Equal(t, prod.Name, getProd.Name)
+	require.Equal(t, prod.Price, getProd.Price)
 }
 
 func TestListProduct(t *testing.T) {
-	createNewProduct(t)
+	prod := createNewProduct(t)
 	arg := ListProductsParams{
 		Limit:  5,
 		Offset: 0,
+		UserID: prod.UserID,
 	}
 
 	prods, err := testRepo.ListProducts(context.Background(), testDB, arg)
@@ -39,8 +41,9 @@ func TestListProduct(t *testing.T) {
 func TestUpdateProduct(t *testing.T) {
 	prod := createNewProduct(t)
 	arg := UpdateProductParams{
-		NewProductName: "new product",
-		ProductID:      prod.ID,
+		Name:  "new product",
+		ID:    prod.ID,
+		Price: 555,
 	}
 
 	newProd, err := testRepo.UpdateProduct(context.Background(), testDB, arg)
@@ -57,12 +60,21 @@ func TestDeleteProduct(t *testing.T) {
 }
 
 func createNewProduct(t *testing.T) Product {
-	prod, err := testRepo.CreateProduct(context.Background(), testDB, "test product")
+	user := createNewUser(t)
+	arg := CreateProductParams{
+		Name:   "test product",
+		Price:  100,
+		UserID: user.ID,
+	}
+
+	prod, err := testRepo.CreateProduct(context.Background(), testDB, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, prod)
 
 	require.Equal(t, "test product", prod.Name)
+	require.Equal(t, int64(100), prod.Price)
+	require.Equal(t, user.ID, prod.UserID)
 
 	return prod
 }

@@ -1,7 +1,7 @@
 package requests
 
 type CreateProductRequest struct {
-	UserID int64
+	UserID int64  `json:"user_id" binding:"required,min=1"`
 	Price  int64  `json:"price" binding:"required,min=1"`
 	Name   string `json:"name" binding:"required"`
 }

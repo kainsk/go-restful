@@ -78,8 +78,17 @@ func (gs *GinServer) GetProduct(c *gin.Context) {
 	c.JSON(200, resp)
 }
 
-func (gs *GinServer) ListProducts(c *gin.Context) {
-	var req requests.ListProductsRequest
+func (gs *GinServer) GetUserProducts(c *gin.Context) {
+	var req requests.GetUserProductsRequest
+	var uri requests.BindUriID
+
+	if err := c.ShouldBindUri(&uri); err != nil {
+		c.JSON(400, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
 	if err := c.ShouldBindQuery(&req); err != nil {
 		c.JSON(400, gin.H{
 			"message": err.Error(),
@@ -87,7 +96,8 @@ func (gs *GinServer) ListProducts(c *gin.Context) {
 		return
 	}
 
-	prods, pagination, err := gs.Service.ListProducts(c, req)
+	req.UserID = uri.ID
+	prods, pagination, err := gs.Service.GetUserProducts(c, req)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": err.Error(),

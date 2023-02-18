@@ -97,6 +97,7 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 		products = append(products, p)
 	}
 
+	// TODO: using cursor based pagination
 	pagination := helpers.Paginate(
 		int32(countProds),
 		int32(len(products)),

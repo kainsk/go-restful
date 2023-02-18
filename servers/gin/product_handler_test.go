@@ -12,6 +12,7 @@ import (
 	"sqlc-rest-api/requests"
 	"sqlc-rest-api/responses"
 	"testing"
+	"time"
 
 	"sqlc-rest-api/mocks"
 
@@ -21,7 +22,8 @@ import (
 )
 
 func TestCreateProduct(t *testing.T) {
-	product := newProductTest()
+	user := newUserTest()
+	product := newProductTest(user)
 
 	testCases := []struct {
 		name          string
@@ -31,9 +33,9 @@ func TestCreateProduct(t *testing.T) {
 	}{
 		{
 			name: "product created successfully",
-			req:  newCreateProductRequest(product.Name),
+			req:  newCreateProductRequest(&user, &product),
 			mock: func(service *mocks.MockService) {
-				req := newCreateProductRequest(product.Name)
+				req := newCreateProductRequest(&user, &product)
 				service.EXPECT().
 					CreateProduct(gomock.Any(), gomock.Eq(req)).
 					Times(1).
@@ -46,9 +48,9 @@ func TestCreateProduct(t *testing.T) {
 		},
 		{
 			name: "validation error product name not given",
-			req:  newCreateProductRequest(""),
+			req:  newCreateProductRequest(nil, nil),
 			mock: func(service *mocks.MockService) {
-				req := newCreateProductRequest("")
+				req := newCreateProductRequest(nil, nil)
 				service.EXPECT().
 					CreateProduct(gomock.Any(), gomock.Eq(req)).
 					Times(0)
@@ -59,9 +61,9 @@ func TestCreateProduct(t *testing.T) {
 		},
 		{
 			name: "internal server error",
-			req:  newCreateProductRequest(product.Name),
+			req:  newCreateProductRequest(&user, &product),
 			mock: func(service *mocks.MockService) {
-				req := newCreateProductRequest(product.Name)
+				req := newCreateProductRequest(&user, &product)
 				service.EXPECT().
 					CreateProduct(gomock.Any(), gomock.Eq(req)).
 					Times(1).
@@ -97,7 +99,8 @@ func TestCreateProduct(t *testing.T) {
 }
 
 func TestDeleteProduct(t *testing.T) {
-	product := newProductTest()
+	user := newUserTest()
+	product := newProductTest(user)
 
 	testCases := []struct {
 		name          string
@@ -184,7 +187,8 @@ func TestDeleteProduct(t *testing.T) {
 }
 
 func TestGetProduct(t *testing.T) {
-	product := newProductTest()
+	user := newUserTest()
+	product := newProductTest(user)
 
 	testCases := []struct {
 		name          string
@@ -271,11 +275,12 @@ func TestGetProduct(t *testing.T) {
 	}
 }
 
-func TestListProduct(t *testing.T) {
+func TestGetUserProducts(t *testing.T) {
 	testCases := []struct {
 		name          string
 		page          int32
 		perPage       int32
+		userID        int32
 		mock          func(service *mocks.MockService) ([]responses.ProductResponse, *responses.Pagination)
 		checkResponse func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.ProductResponse, pagination *responses.Pagination)
 	}{
@@ -289,7 +294,7 @@ func TestListProduct(t *testing.T) {
 				pagination := helpers.Paginate(100, int32(len(products)), 1, 30, "/products")
 
 				service.EXPECT().
-					ListProducts(gomock.Any(), gomock.Eq(req)).
+					GetUserProducts(gomock.Any(), gomock.Eq(req)).
 					Times(1).
 					Return(products, pagination, nil)
 
@@ -310,7 +315,7 @@ func TestListProduct(t *testing.T) {
 				pagination := helpers.Paginate(100, int32(len(products)), 2, 30, "/products")
 
 				service.EXPECT().
-					ListProducts(gomock.Any(), gomock.Eq(req)).
+					GetUserProducts(gomock.Any(), gomock.Eq(req)).
 					Times(1).
 					Return(products, pagination, nil)
 
@@ -331,7 +336,7 @@ func TestListProduct(t *testing.T) {
 				pagination := helpers.Paginate(100, int32(len(products)), 3, 30, "/products")
 
 				service.EXPECT().
-					ListProducts(gomock.Any(), gomock.Eq(req)).
+					GetUserProducts(gomock.Any(), gomock.Eq(req)).
 					Times(1).
 					Return(products, pagination, nil)
 
@@ -352,7 +357,7 @@ func TestListProduct(t *testing.T) {
 				pagination := helpers.Paginate(100, int32(len(products)), 4, 30, "/products")
 
 				service.EXPECT().
-					ListProducts(gomock.Any(), gomock.Eq(req)).
+					GetUserProducts(gomock.Any(), gomock.Eq(req)).
 					Times(1).
 					Return(products, pagination, nil)
 
@@ -373,7 +378,7 @@ func TestListProduct(t *testing.T) {
 				pagination := helpers.Paginate(7, int32(len(products)), 2, 10, "/products")
 
 				service.EXPECT().
-					ListProducts(gomock.Any(), gomock.Eq(req)).
+					GetUserProducts(gomock.Any(), gomock.Eq(req)).
 					Times(1).
 					Return(products, pagination, nil)
 
@@ -394,7 +399,7 @@ func TestListProduct(t *testing.T) {
 				pagination := helpers.Paginate(10, int32(len(products)), 0, 10, "/products")
 
 				service.EXPECT().
-					ListProducts(gomock.Any(), gomock.Eq(req)).
+					GetUserProducts(gomock.Any(), gomock.Eq(req)).
 					Times(0)
 
 				return products, pagination
@@ -413,7 +418,7 @@ func TestListProduct(t *testing.T) {
 				pagination := helpers.Paginate(10, int32(len(products)), 1, 0, "/products")
 
 				service.EXPECT().
-					ListProducts(gomock.Any(), gomock.Eq(req)).
+					GetUserProducts(gomock.Any(), gomock.Eq(req)).
 					Times(0)
 
 				return products, pagination
@@ -432,7 +437,7 @@ func TestListProduct(t *testing.T) {
 				pagination := helpers.Paginate(10, int32(len(products)), 1, 100, "/products")
 
 				service.EXPECT().
-					ListProducts(gomock.Any(), gomock.Eq(req)).
+					GetUserProducts(gomock.Any(), gomock.Eq(req)).
 					Times(0)
 
 				return products, pagination
@@ -451,7 +456,7 @@ func TestListProduct(t *testing.T) {
 				pagination := helpers.Paginate(10, int32(len(products)), 1, 10, "/products")
 
 				service.EXPECT().
-					ListProducts(gomock.Any(), gomock.Eq(req)).
+					GetUserProducts(gomock.Any(), gomock.Eq(req)).
 					Times(1).
 					Return(nil, nil, fmt.Errorf("internal server error"))
 
@@ -484,7 +489,8 @@ func TestListProduct(t *testing.T) {
 }
 
 func TestUpdateProduct(t *testing.T) {
-	product := newProductTest()
+	user := newUserTest()
+	product := newProductTest(user)
 
 	testCases := []struct {
 		name          string
@@ -496,9 +502,9 @@ func TestUpdateProduct(t *testing.T) {
 		{
 			name:      "product updated successfully",
 			productID: product.ID,
-			req:       newUpdateProductRequest(0, product.Name),
+			req:       newUpdateProductRequest(&product),
 			mock: func(service *mocks.MockService) {
-				req := newUpdateProductRequest(1, product.Name)
+				req := newUpdateProductRequest(&product)
 
 				service.EXPECT().
 					UpdateProduct(gomock.Any(), gomock.Eq(req)).
@@ -513,9 +519,9 @@ func TestUpdateProduct(t *testing.T) {
 		{
 			name:      "validation error product id given lower than 1",
 			productID: 0,
-			req:       newUpdateProductRequest(0, product.Name),
+			req:       newUpdateProductRequest(nil),
 			mock: func(service *mocks.MockService) {
-				req := newUpdateProductRequest(0, product.Name)
+				req := newUpdateProductRequest(nil)
 
 				service.EXPECT().
 					UpdateProduct(gomock.Any(), gomock.Eq(req)).
@@ -528,9 +534,9 @@ func TestUpdateProduct(t *testing.T) {
 		{
 			name:      "validation error product name not given",
 			productID: product.ID,
-			req:       newUpdateProductRequest(0, ""),
+			req:       newUpdateProductRequest(nil),
 			mock: func(service *mocks.MockService) {
-				req := newUpdateProductRequest(1, "")
+				req := newUpdateProductRequest(nil)
 
 				service.EXPECT().
 					UpdateProduct(gomock.Any(), gomock.Eq(req)).
@@ -542,10 +548,10 @@ func TestUpdateProduct(t *testing.T) {
 		},
 		{
 			name:      "product not found",
-			productID: 100000,
-			req:       newUpdateProductRequest(0, product.Name),
+			productID: product.ID,
+			req:       newUpdateProductRequest(&product),
 			mock: func(service *mocks.MockService) {
-				req := newUpdateProductRequest(100000, product.Name)
+				req := newUpdateProductRequest(&product)
 
 				service.EXPECT().
 					UpdateProduct(gomock.Any(), gomock.Eq(req)).
@@ -560,9 +566,9 @@ func TestUpdateProduct(t *testing.T) {
 		{
 			name:      "internal server error",
 			productID: product.ID,
-			req:       newUpdateProductRequest(0, product.Name),
+			req:       newUpdateProductRequest(&product),
 			mock: func(service *mocks.MockService) {
-				req := newUpdateProductRequest(1, product.Name)
+				req := newUpdateProductRequest(&product)
 
 				service.EXPECT().
 					UpdateProduct(gomock.Any(), gomock.Eq(req)).
@@ -600,13 +606,25 @@ func TestUpdateProduct(t *testing.T) {
 	}
 }
 
-func newProductTest() responses.ProductResponse {
+func newProductTest(user responses.User) responses.ProductResponse {
 	product := responses.ProductResponse{
-		ID:   1,
-		Name: "Test Product",
+		ID:        1,
+		Name:      "Test Product",
+		Price:     100,
+		UserID:    user.ID,
+		CreatedAt: time.Now(),
 	}
 
 	return product
+}
+
+func newUserTest() responses.User {
+	return responses.User{
+		ID:        1,
+		Name:      "royyan",
+		Email:     "roy@gmail.com",
+		CreatedAt: time.Now(),
+	}
 }
 
 func newProductsTest(total, page, perPage int) []responses.ProductResponse {
@@ -630,9 +648,15 @@ func newProductsTest(total, page, perPage int) []responses.ProductResponse {
 	return products
 }
 
-func newCreateProductRequest(name string) requests.CreateProductRequest {
+func newCreateProductRequest(user *responses.User, product *responses.ProductResponse) requests.CreateProductRequest {
+	if user == nil && product == nil {
+		return requests.CreateProductRequest{}
+	}
+
 	return requests.CreateProductRequest{
-		Name: name,
+		UserID: user.ID,
+		Name:   product.Name,
+		Price:  product.Price,
 	}
 }
 
@@ -642,17 +666,22 @@ func newBindUriIDRequest(id int64) requests.BindUriID {
 	}
 }
 
-func newListProductRequest(page, perPage int32) requests.ListProductsRequest {
-	return requests.ListProductsRequest{
+func newListProductRequest(page, perPage int32) requests.GetUserProductsRequest {
+	return requests.GetUserProductsRequest{
 		Page:    page,
 		PerPage: perPage,
 	}
 }
 
-func newUpdateProductRequest(id int64, newName string) requests.UpdateProductRequest {
+func newUpdateProductRequest(product *responses.ProductResponse) requests.UpdateProductRequest {
+	if product == nil {
+		return requests.UpdateProductRequest{}
+	}
+
 	return requests.UpdateProductRequest{
-		ID:   id,
-		Name: newName,
+		ID:    product.ID,
+		Name:  product.Name,
+		Price: product.Price,
 	}
 }
 
@@ -663,7 +692,11 @@ func requireProductMatch(t *testing.T, body *bytes.Buffer, expectedProduct respo
 	var product responses.ProductResponse
 	parseJson(t, jsonData, "data.product", &product)
 
-	require.Equal(t, expectedProduct, product)
+	// require.Equal(t, expectedProduct, product)
+	require.Equal(t, expectedProduct.ID, product.ID)
+	require.Equal(t, expectedProduct.Name, product.Name)
+	require.Equal(t, expectedProduct.Price, product.Price)
+	require.Equal(t, expectedProduct.UserID, product.UserID)
 }
 
 func requireListProductsMatch(t *testing.T, body *bytes.Buffer, products []responses.ProductResponse, pagination *responses.Pagination) {

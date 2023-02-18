@@ -51,6 +51,21 @@ func (mr *MockServiceMockRecorder) CreateProduct(ctx, req interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProduct", reflect.TypeOf((*MockService)(nil).CreateProduct), ctx, req)
 }
 
+// CreateUser mocks base method.
+func (m *MockService) CreateUser(ctx context.Context, req requests.CreateUserRequest) (responses.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUser", ctx, req)
+	ret0, _ := ret[0].(responses.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUser indicates an expected call of CreateUser.
+func (mr *MockServiceMockRecorder) CreateUser(ctx, req interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockService)(nil).CreateUser), ctx, req)
+}
+
 // DeleteProduct mocks base method.
 func (m *MockService) DeleteProduct(ctx context.Context, req requests.BindUriID) error {
 	m.ctrl.T.Helper()
@@ -80,20 +95,35 @@ func (mr *MockServiceMockRecorder) GetProduct(ctx, req interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProduct", reflect.TypeOf((*MockService)(nil).GetProduct), ctx, req)
 }
 
-// ListProducts mocks base method.
-func (m *MockService) ListProducts(ctx context.Context, req requests.ListProductsRequest) ([]responses.ProductResponse, *responses.Pagination, error) {
+// GetUser mocks base method.
+func (m *MockService) GetUser(ctx context.Context, req requests.BindUriID) (responses.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProducts", ctx, req)
+	ret := m.ctrl.Call(m, "GetUser", ctx, req)
+	ret0, _ := ret[0].(responses.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUser indicates an expected call of GetUser.
+func (mr *MockServiceMockRecorder) GetUser(ctx, req interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockService)(nil).GetUser), ctx, req)
+}
+
+// GetUserProducts mocks base method.
+func (m *MockService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) ([]responses.ProductResponse, *responses.Pagination, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserProducts", ctx, req)
 	ret0, _ := ret[0].([]responses.ProductResponse)
 	ret1, _ := ret[1].(*responses.Pagination)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
 
-// ListProducts indicates an expected call of ListProducts.
-func (mr *MockServiceMockRecorder) ListProducts(ctx, req interface{}) *gomock.Call {
+// GetUserProducts indicates an expected call of GetUserProducts.
+func (mr *MockServiceMockRecorder) GetUserProducts(ctx, req interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProducts", reflect.TypeOf((*MockService)(nil).ListProducts), ctx, req)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserProducts", reflect.TypeOf((*MockService)(nil).GetUserProducts), ctx, req)
 }
 
 // UpdateProduct mocks base method.

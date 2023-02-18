@@ -34,13 +34,7 @@ func (pq *PostgresService) CreateProduct(ctx context.Context, req requests.Creat
 		return responses.Product{}, err
 	}
 
-	return responses.Product{
-		ID:        prod.ID,
-		Name:      prod.Name,
-		Price:     prod.Price,
-		UserID:    prod.UserID,
-		CreatedAt: prod.CreatedAt.Time,
-	}, nil
+	return helpers.ProductResponse(prod), nil
 }
 
 func (pq *PostgresService) DeleteProduct(ctx context.Context, req requests.BindUriID) error {
@@ -58,13 +52,7 @@ func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriI
 		return responses.Product{}, fmt.Errorf("product with id %d not found", req.ID)
 	}
 
-	return responses.Product{
-		ID:        prod.ID,
-		Name:      prod.Name,
-		Price:     prod.Price,
-		UserID:    prod.UserID,
-		CreatedAt: prod.CreatedAt.Time,
-	}, nil
+	return helpers.ProductResponse(prod), nil
 }
 
 func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) ([]responses.Product, *responses.Pagination, error) {
@@ -86,15 +74,7 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 
 	var products []responses.Product
 	for _, prod := range prods {
-		p := responses.Product{
-			ID:        prod.ID,
-			Name:      prod.Name,
-			Price:     prod.Price,
-			UserID:    prod.UserID,
-			CreatedAt: prod.CreatedAt.Time,
-		}
-
-		products = append(products, p)
+		products = append(products, helpers.ProductResponse(prod))
 	}
 
 	// TODO: using cursor based pagination
@@ -126,13 +106,7 @@ func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.Updat
 		return responses.Product{}, err
 	}
 
-	return responses.Product{
-		ID:        updated.ID,
-		Name:      updated.Name,
-		Price:     updated.Price,
-		UserID:    updated.UserID,
-		CreatedAt: updated.CreatedAt.Time,
-	}, nil
+	return helpers.ProductResponse(updated), nil
 }
 
 func (pq *PostgresService) CreateUser(ctx context.Context, req requests.CreateUserRequest) (responses.User, error) {
@@ -146,12 +120,7 @@ func (pq *PostgresService) CreateUser(ctx context.Context, req requests.CreateUs
 		return responses.User{}, err
 	}
 
-	return responses.User{
-		ID:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt.Time,
-	}, nil
+	return helpers.UserResponse(user), nil
 }
 
 func (pq *PostgresService) GetUser(ctx context.Context, req requests.BindUriID) (responses.User, error) {
@@ -160,10 +129,5 @@ func (pq *PostgresService) GetUser(ctx context.Context, req requests.BindUriID) 
 		return responses.User{}, err
 	}
 
-	return responses.User{
-		ID:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt.Time,
-	}, nil
+	return helpers.UserResponse(user), nil
 }

@@ -37,10 +37,10 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // CreateProduct mocks base method.
-func (m *MockService) CreateProduct(ctx context.Context, req requests.CreateProductRequest) (responses.ProductResponse, error) {
+func (m *MockService) CreateProduct(ctx context.Context, req requests.CreateProductRequest) (responses.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateProduct", ctx, req)
-	ret0, _ := ret[0].(responses.ProductResponse)
+	ret0, _ := ret[0].(responses.Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -81,10 +81,10 @@ func (mr *MockServiceMockRecorder) DeleteProduct(ctx, req interface{}) *gomock.C
 }
 
 // GetProduct mocks base method.
-func (m *MockService) GetProduct(ctx context.Context, req requests.BindUriID) (responses.ProductResponse, error) {
+func (m *MockService) GetProduct(ctx context.Context, req requests.BindUriID) (responses.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProduct", ctx, req)
-	ret0, _ := ret[0].(responses.ProductResponse)
+	ret0, _ := ret[0].(responses.Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -111,10 +111,10 @@ func (mr *MockServiceMockRecorder) GetUser(ctx, req interface{}) *gomock.Call {
 }
 
 // GetUserProducts mocks base method.
-func (m *MockService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) ([]responses.ProductResponse, *responses.Pagination, error) {
+func (m *MockService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) ([]responses.Product, *responses.Pagination, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserProducts", ctx, req)
-	ret0, _ := ret[0].([]responses.ProductResponse)
+	ret0, _ := ret[0].([]responses.Product)
 	ret1, _ := ret[1].(*responses.Pagination)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
@@ -127,10 +127,10 @@ func (mr *MockServiceMockRecorder) GetUserProducts(ctx, req interface{}) *gomock
 }
 
 // UpdateProduct mocks base method.
-func (m *MockService) UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (responses.ProductResponse, error) {
+func (m *MockService) UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (responses.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateProduct", ctx, req)
-	ret0, _ := ret[0].(responses.ProductResponse)
+	ret0, _ := ret[0].(responses.Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

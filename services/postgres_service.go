@@ -22,7 +22,7 @@ func NewPostgresService(db *sql.DB, pqrepo repositories.Querier) *PostgresServic
 	}
 }
 
-func (pq *PostgresService) CreateProduct(ctx context.Context, req requests.CreateProductRequest) (responses.ProductResponse, error) {
+func (pq *PostgresService) CreateProduct(ctx context.Context, req requests.CreateProductRequest) (responses.Product, error) {
 	arg := repositories.CreateProductParams{
 		UserID: req.UserID,
 		Name:   req.Name,
@@ -31,10 +31,10 @@ func (pq *PostgresService) CreateProduct(ctx context.Context, req requests.Creat
 
 	prod, err := pq.Repo.CreateProduct(ctx, pq.DB, arg)
 	if err != nil {
-		return responses.ProductResponse{}, err
+		return responses.Product{}, err
 	}
 
-	return responses.ProductResponse{
+	return responses.Product{
 		ID:        prod.ID,
 		Name:      prod.Name,
 		Price:     prod.Price,
@@ -52,13 +52,13 @@ func (pq *PostgresService) DeleteProduct(ctx context.Context, req requests.BindU
 	return pq.Repo.DeleteProduct(ctx, pq.DB, prod.ID)
 }
 
-func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriID) (responses.ProductResponse, error) {
+func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriID) (responses.Product, error) {
 	prod, err := pq.Repo.GetProduct(ctx, pq.DB, req.ID)
 	if err != nil {
-		return responses.ProductResponse{}, fmt.Errorf("product with id %d not found", req.ID)
+		return responses.Product{}, fmt.Errorf("product with id %d not found", req.ID)
 	}
 
-	return responses.ProductResponse{
+	return responses.Product{
 		ID:        prod.ID,
 		Name:      prod.Name,
 		Price:     prod.Price,
@@ -67,7 +67,7 @@ func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriI
 	}, nil
 }
 
-func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) ([]responses.ProductResponse, *responses.Pagination, error) {
+func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) ([]responses.Product, *responses.Pagination, error) {
 	countProds, err := pq.Repo.CountProductsByUserID(ctx, pq.DB, req.UserID)
 	if err != nil {
 		return nil, nil, err
@@ -84,9 +84,9 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 		return nil, nil, err
 	}
 
-	var products []responses.ProductResponse
+	var products []responses.Product
 	for _, prod := range prods {
-		p := responses.ProductResponse{
+		p := responses.Product{
 			ID:        prod.ID,
 			Name:      prod.Name,
 			Price:     prod.Price,
@@ -109,10 +109,10 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 	return products, pagination, nil
 }
 
-func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (responses.ProductResponse, error) {
+func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (responses.Product, error) {
 	prod, err := pq.Repo.GetProduct(ctx, pq.DB, req.ID)
 	if err != nil {
-		return responses.ProductResponse{}, fmt.Errorf("product with id %d not found", req.ID)
+		return responses.Product{}, fmt.Errorf("product with id %d not found", req.ID)
 	}
 
 	arg := repositories.UpdateProductParams{
@@ -123,10 +123,10 @@ func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.Updat
 
 	updated, err := pq.Repo.UpdateProduct(ctx, pq.DB, arg)
 	if err != nil {
-		return responses.ProductResponse{}, err
+		return responses.Product{}, err
 	}
 
-	return responses.ProductResponse{
+	return responses.Product{
 		ID:        updated.ID,
 		Name:      updated.Name,
 		Price:     updated.Price,

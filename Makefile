@@ -14,3 +14,6 @@ pqclean:
 
 pqmock:
 	mockgen -package mocks -destination mocks/service_mock.go -source services/service.go Service
+
+gqlgen:
+	go run github.com/99designs/gqlgen generate

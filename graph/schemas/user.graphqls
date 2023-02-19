@@ -1,0 +1,32 @@
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    created_at: Time!
+    products(input: UserProducts!): Products 
+}
+
+input NewUser {
+    name: String!
+    email: String!
+}
+
+input UriID {
+    id: ID!
+}
+
+input UserProducts {
+    user_id: ID!
+    first: Int!
+    after: String!
+}
+
+type Mutation {
+    CreateUser(input: NewUser!): User!
+}
+
+type Query {
+    GetUser(input: UriID!): User!
+}
+
+scalar Time

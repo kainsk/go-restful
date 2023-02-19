@@ -1,0 +1,46 @@
+type Product {
+    id: ID!
+    name: String!
+    price: Int!
+    user_id: ID!
+    created_at: Time!
+    user: User!
+}
+
+type ProductEdge {
+    cursor: String!
+    node: Product!
+}
+
+type Products {
+    edges: [ProductEdge!]!
+    page_info: PageInfo!
+}
+
+type PageInfo {
+    start_cursor: String!
+    end_cursor: String!
+    has_next_page: Boolean!
+}
+
+input NewProduct {
+    user_id: ID!
+    name: String!
+    price: Int!
+}
+
+input UpdateProduct {
+    id: ID!
+    name: String!
+    price: Int!
+}
+
+extend type Mutation {
+    CreateProduct(input: NewProduct!): Product!
+    UpdateProduct(input: UpdateProduct!): Product!
+    DeleteProduct(input: UriID!): Boolean
+}
+
+extend type Query {
+    GetProduct(input: UriID!): Product!
+}

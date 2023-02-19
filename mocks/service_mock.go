@@ -111,13 +111,12 @@ func (mr *MockServiceMockRecorder) GetUser(ctx, req interface{}) *gomock.Call {
 }
 
 // GetUserProducts mocks base method.
-func (m *MockService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) ([]responses.Product, *responses.Pagination, error) {
+func (m *MockService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (responses.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserProducts", ctx, req)
-	ret0, _ := ret[0].([]responses.Product)
-	ret1, _ := ret[1].(*responses.Pagination)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret0, _ := ret[0].(responses.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetUserProducts indicates an expected call of GetUserProducts.

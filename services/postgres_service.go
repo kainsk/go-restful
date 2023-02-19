@@ -3,11 +3,13 @@ package services
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"sqlc-rest-api/db/postgres/repositories"
 	"sqlc-rest-api/helpers"
 	"sqlc-rest-api/requests"
 	"sqlc-rest-api/responses"
+	"time"
 )
 
 type PostgresService struct {
@@ -55,38 +57,66 @@ func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriI
 	return helpers.ProductResponse(prod), nil
 }
 
-func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) ([]responses.Product, *responses.Pagination, error) {
-	countProds, err := pq.Repo.CountProductsByUserID(ctx, pq.DB, req.UserID)
+func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (responses.User, error) {
+	u, err := pq.Repo.GetUser(ctx, pq.DB, req.UserID)
 	if err != nil {
-		return nil, nil, err
+		return responses.User{}, fmt.Errorf("user with id %d not found", req.UserID)
 	}
 
-	arg := repositories.ListProductsParams{
-		Offset: (req.Page - 1) * req.PerPage,
-		Limit:  req.PerPage,
+	after := time.Now()
+	if req.After != nil {
+		after = helpers.DecodeCursor(*req.After)
+	}
+
+	arg := repositories.GetUserProductsParams{
 		UserID: req.UserID,
+		After:  sql.NullTime{Valid: true, Time: after},
+		First:  int32(*req.First),
 	}
 
-	prods, err := pq.Repo.ListProducts(ctx, pq.DB, arg)
+	results, err := pq.Repo.GetUserProducts(ctx, pq.DB, arg)
 	if err != nil {
-		return nil, nil, err
+		return responses.User{}, err
 	}
 
-	var products []responses.Product
-	for _, prod := range prods {
-		products = append(products, helpers.ProductResponse(prod))
+	if len(results) < 1 {
+		user := helpers.UserResponse(u)
+		user.Products = &responses.Products{}
+		return user, nil
 	}
 
-	// TODO: using cursor based pagination
-	pagination := helpers.Paginate(
-		int32(countProds),
-		int32(len(products)),
-		req.Page,
-		req.PerPage,
-		"/products",
-	)
+	var hasNextPage bool
+	edges := make([]*responses.ProductEdge, len(results))
+	for i, result := range results {
+		hasNextPage = result.Exists
+		ds := result.CreatedAt.Time.String()
+		edges[i] = &responses.ProductEdge{
+			Cursor: base64.StdEncoding.EncodeToString([]byte(ds)),
+			Node: &responses.Product{
+				ID:        result.ID,
+				Name:      result.Name,
+				Price:     result.Price,
+				UserID:    result.UserID,
+				CreatedAt: result.CreatedAt.Time,
+			},
+		}
+	}
 
-	return products, pagination, nil
+	pageInfo := responses.PageInfo{
+		StartCursor: base64.StdEncoding.EncodeToString([]byte(edges[0].Node.CreatedAt.String())),
+		EndCursor:   base64.StdEncoding.EncodeToString([]byte(edges[len(edges)-1].Node.CreatedAt.String())),
+		HasNextPage: hasNextPage,
+	}
+
+	products := responses.Products{
+		Edges:    edges,
+		PageInfo: pageInfo,
+	}
+
+	user := helpers.UserResponse(u)
+	user.Products = &products
+
+	return user, nil
 }
 
 func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (responses.Product, error) {

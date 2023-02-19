@@ -7,6 +7,7 @@ package repositories
 
 import (
 	"context"
+	"database/sql"
 )
 
 const countProductsByUserID = `-- name: CountProductsByUserID :one
@@ -77,6 +78,70 @@ func (q *Queries) GetProduct(ctx context.Context, db DBTX, id int64) (Product, e
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getUserProducts = `-- name: GetUserProducts :many
+SELECT id, name, price, user_id, created_at,
+    EXISTS(
+        SELECT 1
+        FROM products AS pp
+        WHERE pp.user_id = $1 AND pp.created_at < (
+            SELECT created_at
+            FROM products AS ppp
+            WHERE ppp.user_id = $1 AND ppp.created_at < $2
+            ORDER BY created_at ASC
+            LIMIT 1
+        )       
+    )
+FROM products AS p
+WHERE p.user_id = $1 AND p.created_at < $2
+ORDER BY p.created_at DESC
+LIMIT $3
+`
+
+type GetUserProductsParams struct {
+	UserID int64        `json:"user_id"`
+	After  sql.NullTime `json:"after"`
+	First  int32        `json:"first"`
+}
+
+type GetUserProductsRow struct {
+	ID        int64        `json:"id"`
+	Name      string       `json:"name"`
+	Price     int64        `json:"price"`
+	UserID    int64        `json:"user_id"`
+	CreatedAt sql.NullTime `json:"created_at"`
+	Exists    bool         `json:"exists"`
+}
+
+func (q *Queries) GetUserProducts(ctx context.Context, db DBTX, arg GetUserProductsParams) ([]GetUserProductsRow, error) {
+	rows, err := db.QueryContext(ctx, getUserProducts, arg.UserID, arg.After, arg.First)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserProductsRow
+	for rows.Next() {
+		var i GetUserProductsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			&i.UserID,
+			&i.CreatedAt,
+			&i.Exists,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listProducts = `-- name: ListProducts :many

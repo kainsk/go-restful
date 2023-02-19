@@ -5,10 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"net/http/httptest"
-	"sqlc-rest-api/helpers"
 	"sqlc-rest-api/requests"
 	"sqlc-rest-api/responses"
 	"testing"
@@ -275,219 +273,6 @@ func TestGetProduct(t *testing.T) {
 	}
 }
 
-func TestGetUserProducts(t *testing.T) {
-	testCases := []struct {
-		name          string
-		page          int32
-		perPage       int32
-		userID        int32
-		mock          func(service *mocks.MockService) ([]responses.Product, *responses.Pagination)
-		checkResponse func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination)
-	}{
-		{
-			name:    "total products 100 per page 30 current page is 1",
-			page:    1,
-			perPage: 30,
-			mock: func(service *mocks.MockService) ([]responses.Product, *responses.Pagination) {
-				req := newListProductRequest(1, 30)
-				products := newProductsTest(100, 1, 30)
-				pagination := helpers.Paginate(100, int32(len(products)), 1, 30, "/products")
-
-				service.EXPECT().
-					GetUserProducts(gomock.Any(), gomock.Eq(req)).
-					Times(1).
-					Return(products, pagination, nil)
-
-				return products, pagination
-			},
-			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination) {
-				require.Equal(t, http.StatusOK, rec.Code)
-				requireListProductsMatch(t, rec.Body, products, pagination)
-			},
-		},
-		{
-			name:    "total products 100 per page 30 current page is 2",
-			page:    2,
-			perPage: 30,
-			mock: func(service *mocks.MockService) ([]responses.Product, *responses.Pagination) {
-				req := newListProductRequest(2, 30)
-				products := newProductsTest(100, 2, 30)
-				pagination := helpers.Paginate(100, int32(len(products)), 2, 30, "/products")
-
-				service.EXPECT().
-					GetUserProducts(gomock.Any(), gomock.Eq(req)).
-					Times(1).
-					Return(products, pagination, nil)
-
-				return products, pagination
-			},
-			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination) {
-				require.Equal(t, http.StatusOK, rec.Code)
-				requireListProductsMatch(t, rec.Body, products, pagination)
-			},
-		},
-		{
-			name:    "total products 100 per page 30 current page is 3",
-			page:    3,
-			perPage: 30,
-			mock: func(service *mocks.MockService) ([]responses.Product, *responses.Pagination) {
-				req := newListProductRequest(3, 30)
-				products := newProductsTest(100, 3, 30)
-				pagination := helpers.Paginate(100, int32(len(products)), 3, 30, "/products")
-
-				service.EXPECT().
-					GetUserProducts(gomock.Any(), gomock.Eq(req)).
-					Times(1).
-					Return(products, pagination, nil)
-
-				return products, pagination
-			},
-			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination) {
-				require.Equal(t, http.StatusOK, rec.Code)
-				requireListProductsMatch(t, rec.Body, products, pagination)
-			},
-		},
-		{
-			name:    "total products 100 per page 30 current page is 4",
-			page:    4,
-			perPage: 30,
-			mock: func(service *mocks.MockService) ([]responses.Product, *responses.Pagination) {
-				req := newListProductRequest(4, 30)
-				products := newProductsTest(100, 4, 30)
-				pagination := helpers.Paginate(100, int32(len(products)), 4, 30, "/products")
-
-				service.EXPECT().
-					GetUserProducts(gomock.Any(), gomock.Eq(req)).
-					Times(1).
-					Return(products, pagination, nil)
-
-				return products, pagination
-			},
-			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination) {
-				require.Equal(t, http.StatusOK, rec.Code)
-				requireListProductsMatch(t, rec.Body, products, pagination)
-			},
-		},
-		{
-			name:    "pagination over page",
-			page:    2,
-			perPage: 10,
-			mock: func(service *mocks.MockService) ([]responses.Product, *responses.Pagination) {
-				req := newListProductRequest(2, 10)
-				products := newProductsTest(7, 2, 10)
-				pagination := helpers.Paginate(7, int32(len(products)), 2, 10, "/products")
-
-				service.EXPECT().
-					GetUserProducts(gomock.Any(), gomock.Eq(req)).
-					Times(1).
-					Return(products, pagination, nil)
-
-				return products, pagination
-			},
-			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination) {
-				require.Equal(t, http.StatusOK, rec.Code)
-				requireListProductsMatch(t, rec.Body, products, pagination)
-			},
-		},
-		{
-			name:    "validation error given page lower than one",
-			page:    0,
-			perPage: 10,
-			mock: func(service *mocks.MockService) ([]responses.Product, *responses.Pagination) {
-				req := newListProductRequest(0, 10)
-				products := newProductsTest(10, 0, 10)
-				pagination := helpers.Paginate(10, int32(len(products)), 0, 10, "/products")
-
-				service.EXPECT().
-					GetUserProducts(gomock.Any(), gomock.Eq(req)).
-					Times(0)
-
-				return products, pagination
-			},
-			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination) {
-				require.Equal(t, http.StatusBadRequest, rec.Code)
-			},
-		},
-		{
-			name:    "validation error given per page lower than one",
-			page:    1,
-			perPage: 0,
-			mock: func(service *mocks.MockService) ([]responses.Product, *responses.Pagination) {
-				req := newListProductRequest(1, 0)
-				products := newProductsTest(10, 1, 0)
-				pagination := helpers.Paginate(10, int32(len(products)), 1, 0, "/products")
-
-				service.EXPECT().
-					GetUserProducts(gomock.Any(), gomock.Eq(req)).
-					Times(0)
-
-				return products, pagination
-			},
-			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination) {
-				require.Equal(t, http.StatusBadRequest, rec.Code)
-			},
-		},
-		{
-			name:    "validation error given per page higher than 50",
-			page:    1,
-			perPage: 100,
-			mock: func(service *mocks.MockService) ([]responses.Product, *responses.Pagination) {
-				req := newListProductRequest(1, 100)
-				products := newProductsTest(10, 1, 100)
-				pagination := helpers.Paginate(10, int32(len(products)), 1, 100, "/products")
-
-				service.EXPECT().
-					GetUserProducts(gomock.Any(), gomock.Eq(req)).
-					Times(0)
-
-				return products, pagination
-			},
-			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination) {
-				require.Equal(t, http.StatusBadRequest, rec.Code)
-			},
-		},
-		{
-			name:    "internal server error",
-			page:    1,
-			perPage: 10,
-			mock: func(service *mocks.MockService) ([]responses.Product, *responses.Pagination) {
-				req := newListProductRequest(1, 10)
-				products := newProductsTest(10, 1, 10)
-				pagination := helpers.Paginate(10, int32(len(products)), 1, 10, "/products")
-
-				service.EXPECT().
-					GetUserProducts(gomock.Any(), gomock.Eq(req)).
-					Times(1).
-					Return(nil, nil, fmt.Errorf("internal server error"))
-
-				return products, pagination
-			},
-			checkResponse: func(t *testing.T, rec *httptest.ResponseRecorder, products []responses.Product, pagination *responses.Pagination) {
-				require.Equal(t, http.StatusInternalServerError, rec.Code)
-			},
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
-			service := mocks.NewMockService(ctrl)
-			server := newGinTestServer(t, service)
-
-			products, pagination := testCase.mock(service)
-			url := fmt.Sprintf("/products?page=%d&per_page=%d", testCase.page, testCase.perPage)
-			rec := httptest.NewRecorder()
-			request, err := http.NewRequest(http.MethodGet, url, nil)
-			require.NoError(t, err)
-
-			server.Engine.ServeHTTP(rec, request)
-			testCase.checkResponse(t, rec, products, pagination)
-		})
-	}
-}
-
 func TestUpdateProduct(t *testing.T) {
 	user := newUserTest()
 	product := newProductTest(user)
@@ -627,27 +412,6 @@ func newUserTest() responses.User {
 	}
 }
 
-func newProductsTest(total, page, perPage int) []responses.Product {
-	lastPage := int(math.Ceil(float64(total) - float64(perPage)))
-	var count int
-	if page < lastPage {
-		count = perPage
-	} else {
-		count = total - ((page - 1) * perPage)
-	}
-
-	var products []responses.Product
-	for i := 0; i < count; i++ {
-		product := responses.Product{
-			Name: fmt.Sprintf("test product %d", count+1),
-		}
-
-		products = append(products, product)
-	}
-
-	return products
-}
-
 func newCreateProductRequest(user *responses.User, product *responses.Product) requests.CreateProductRequest {
 	if user == nil && product == nil {
 		return requests.CreateProductRequest{}
@@ -663,13 +427,6 @@ func newCreateProductRequest(user *responses.User, product *responses.Product) r
 func newBindUriIDRequest(id int64) requests.BindUriID {
 	return requests.BindUriID{
 		ID: id,
-	}
-}
-
-func newListProductRequest(page, perPage int32) requests.GetUserProductsRequest {
-	return requests.GetUserProductsRequest{
-		Page:    page,
-		PerPage: perPage,
 	}
 }
 
@@ -697,20 +454,6 @@ func requireProductMatch(t *testing.T, body *bytes.Buffer, expectedProduct respo
 	require.Equal(t, expectedProduct.Name, product.Name)
 	require.Equal(t, expectedProduct.Price, product.Price)
 	require.Equal(t, expectedProduct.UserID, product.UserID)
-}
-
-func requireListProductsMatch(t *testing.T, body *bytes.Buffer, products []responses.Product, pagination *responses.Pagination) {
-	jsonData, err := io.ReadAll(body)
-	require.NoError(t, err)
-
-	var actualProducts []responses.Product
-	parseJson(t, jsonData, "data.products", &actualProducts)
-
-	var actualPagination *responses.Pagination
-	parseJson(t, jsonData, "data.pagination", &actualPagination)
-
-	require.Equal(t, products, actualProducts)
-	require.Equal(t, pagination, actualPagination)
 }
 
 func parseJson(t *testing.T, data []byte, path string, placeholder any) {

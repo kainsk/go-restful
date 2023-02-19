@@ -10,3 +10,13 @@ type Product struct {
 	CreatedAt time.Time `json:"created_at"`
 	User      *User     `json:"user,omitempty"`
 }
+
+type Products struct {
+	Edges    []*ProductEdge `json:"edges"`
+	PageInfo PageInfo       `json:"page_info"`
+}
+
+type ProductEdge struct {
+	Cursor string   `json:"cursor"`
+	Node   *Product `json:"node"`
+}

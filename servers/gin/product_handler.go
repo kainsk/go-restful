@@ -97,7 +97,7 @@ func (gs *GinServer) GetUserProducts(c *gin.Context) {
 	}
 
 	req.UserID = uri.ID
-	prods, pagination, err := gs.Service.GetUserProducts(c, req)
+	user, err := gs.Service.GetUserProducts(c, req)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": err.Error(),
@@ -106,11 +106,10 @@ func (gs *GinServer) GetUserProducts(c *gin.Context) {
 	}
 
 	data := gin.H{
-		"products":   prods,
-		"pagination": pagination,
+		"user": user,
 	}
 
-	resp := helpers.SuccessResponse("list products successfully", data)
+	resp := helpers.SuccessResponse("list user products successfully", data)
 	c.JSON(200, resp)
 }
 

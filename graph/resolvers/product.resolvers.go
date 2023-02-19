@@ -6,7 +6,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 	"sqlc-rest-api/graph/generated"
 	"sqlc-rest-api/requests"
 	"sqlc-rest-api/responses"
@@ -14,27 +13,36 @@ import (
 
 // CreateProduct is the resolver for the CreateProduct field.
 func (r *mutationResolver) CreateProduct(ctx context.Context, input requests.CreateProductRequest) (responses.Product, error) {
-	panic(fmt.Errorf("not implemented: CreateProduct - CreateProduct"))
+	return r.Service.CreateProduct(ctx, input)
 }
 
 // UpdateProduct is the resolver for the UpdateProduct field.
 func (r *mutationResolver) UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (responses.Product, error) {
-	panic(fmt.Errorf("not implemented: UpdateProduct - UpdateProduct"))
+	return r.Service.UpdateProduct(ctx, input)
 }
 
 // DeleteProduct is the resolver for the DeleteProduct field.
 func (r *mutationResolver) DeleteProduct(ctx context.Context, input requests.BindUriID) (*bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteProduct - DeleteProduct"))
+	err := r.Service.DeleteProduct(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }
 
 // User is the resolver for the user field.
-func (r *productResolver) User(ctx context.Context, obj *responses.Product, input requests.BindUriID) (responses.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+func (r *productResolver) User(ctx context.Context, obj *responses.Product, input *requests.BindUriID) (responses.User, error) {
+	arg := requests.BindUriID{
+		ID: obj.UserID,
+	}
+
+	return r.Service.GetUser(ctx, arg)
 }
 
 // GetProduct is the resolver for the GetProduct field.
 func (r *queryResolver) GetProduct(ctx context.Context, input requests.BindUriID) (responses.Product, error) {
-	panic(fmt.Errorf("not implemented: GetProduct - GetProduct"))
+	return r.Service.GetProduct(ctx, input)
 }
 
 // Product returns generated.ProductResolver implementation.

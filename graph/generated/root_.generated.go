@@ -58,7 +58,7 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
 		Price     func(childComplexity int) int
-		User      func(childComplexity int, input requests.BindUriID) int
+		User      func(childComplexity int, input *requests.BindUriID) int
 		UserID    func(childComplexity int) int
 	}
 
@@ -208,7 +208,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Product.User(childComplexity, args["input"].(requests.BindUriID)), true
+		return e.complexity.Product.User(childComplexity, args["input"].(*requests.BindUriID)), true
 
 	case "Product.user_id":
 		if e.complexity.Product.UserID == nil {
@@ -388,7 +388,7 @@ var sources = []*ast.Source{
     price: Int!
     user_id: ID!
     created_at: Time!
-    user(input: UriID!): User!
+    user(input: UriID): User!
 }
 
 type ProductEdge {

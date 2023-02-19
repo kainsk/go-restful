@@ -20,7 +20,7 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type ProductResolver interface {
-	User(ctx context.Context, obj *responses.Product, input requests.BindUriID) (responses.User, error)
+	User(ctx context.Context, obj *responses.Product, input *requests.BindUriID) (responses.User, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -30,10 +30,10 @@ type ProductResolver interface {
 func (ec *executionContext) field_Product_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 requests.BindUriID
+	var arg0 *requests.BindUriID
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUriID2sqlcᚑrestᚑapiᚋrequestsᚐBindUriID(ctx, tmp)
+		arg0, err = ec.unmarshalOUriID2ᚖsqlcᚑrestᚑapiᚋrequestsᚐBindUriID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -416,7 +416,7 @@ func (ec *executionContext) _Product_user(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Product().User(rctx, obj, fc.Args["input"].(requests.BindUriID))
+		return ec.resolvers.Product().User(rctx, obj, fc.Args["input"].(*requests.BindUriID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

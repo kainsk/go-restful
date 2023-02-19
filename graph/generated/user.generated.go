@@ -1265,4 +1265,12 @@ func (ec *executionContext) unmarshalNUserProducts2sqlcᚑrestᚑapiᚋrequests�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalOUriID2ᚖsqlcᚑrestᚑapiᚋrequestsᚐBindUriID(ctx context.Context, v interface{}) (*requests.BindUriID, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUriID(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 // endregion ***************************** type.gotpl *****************************

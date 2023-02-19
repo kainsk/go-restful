@@ -4,7 +4,7 @@ type Product {
     price: Int!
     user_id: ID!
     created_at: Time!
-    user(input: UriID!): User!
+    user(input: UriID): User!
 }
 
 type ProductEdge {

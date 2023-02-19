@@ -13,13 +13,13 @@ import (
 )
 
 // CreateUser is the resolver for the CreateUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input requests.CreateUserRequest) (*responses.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - CreateUser"))
+func (r *mutationResolver) CreateUser(ctx context.Context, input requests.CreateUserRequest) (responses.User, error) {
+	return r.Service.CreateUser(ctx, input)
 }
 
 // GetUser is the resolver for the GetUser field.
-func (r *queryResolver) GetUser(ctx context.Context, input requests.BindUriID) (*responses.User, error) {
-	panic(fmt.Errorf("not implemented: GetUser - GetUser"))
+func (r *queryResolver) GetUser(ctx context.Context, input requests.BindUriID) (responses.User, error) {
+	return r.Service.GetUser(ctx, input)
 }
 
 // Products is the resolver for the products field.

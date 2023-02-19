@@ -20,7 +20,7 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type ProductResolver interface {
-	User(ctx context.Context, obj *responses.Product, input requests.BindUriID) (*responses.User, error)
+	User(ctx context.Context, obj *responses.Product, input requests.BindUriID) (responses.User, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -428,9 +428,9 @@ func (ec *executionContext) _Product_user(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*responses.User)
+	res := resTmp.(responses.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖsqlcᚑrestᚑapiᚋresponsesᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2sqlcᚑrestᚑapiᚋresponsesᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Product_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {

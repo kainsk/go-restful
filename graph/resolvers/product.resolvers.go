@@ -13,12 +13,12 @@ import (
 )
 
 // CreateProduct is the resolver for the CreateProduct field.
-func (r *mutationResolver) CreateProduct(ctx context.Context, input requests.CreateProductRequest) (*responses.Product, error) {
+func (r *mutationResolver) CreateProduct(ctx context.Context, input requests.CreateProductRequest) (responses.Product, error) {
 	panic(fmt.Errorf("not implemented: CreateProduct - CreateProduct"))
 }
 
 // UpdateProduct is the resolver for the UpdateProduct field.
-func (r *mutationResolver) UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (*responses.Product, error) {
+func (r *mutationResolver) UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (responses.Product, error) {
 	panic(fmt.Errorf("not implemented: UpdateProduct - UpdateProduct"))
 }
 
@@ -28,12 +28,12 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, input requests.Bin
 }
 
 // User is the resolver for the user field.
-func (r *productResolver) User(ctx context.Context, obj *responses.Product, input requests.BindUriID) (*responses.User, error) {
+func (r *productResolver) User(ctx context.Context, obj *responses.Product, input requests.BindUriID) (responses.User, error) {
 	panic(fmt.Errorf("not implemented: User - user"))
 }
 
 // GetProduct is the resolver for the GetProduct field.
-func (r *queryResolver) GetProduct(ctx context.Context, input requests.BindUriID) (*responses.Product, error) {
+func (r *queryResolver) GetProduct(ctx context.Context, input requests.BindUriID) (responses.Product, error) {
 	panic(fmt.Errorf("not implemented: GetProduct - GetProduct"))
 }
 

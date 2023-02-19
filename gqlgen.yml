@@ -1,6 +1,8 @@
 schema:
 - graph/schemas/*.graphqls
 
+resolvers_always_return_pointers: false
+
 exec:
   layout: follow-schema
   dir: graph/generated

@@ -6,8 +6,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sqlc-rest-api/graph/models"
+	"sqlc-rest-api/requests"
+	"sqlc-rest-api/responses"
 	"strconv"
+	"sync/atomic"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -18,14 +20,17 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type MutationResolver interface {
-	CreateUser(ctx context.Context, input models.NewUser) (*models.User, error)
-	CreateProduct(ctx context.Context, input models.NewProduct) (*models.Product, error)
-	UpdateProduct(ctx context.Context, input models.UpdateProduct) (*models.Product, error)
-	DeleteProduct(ctx context.Context, input models.URIID) (*bool, error)
+	CreateUser(ctx context.Context, input requests.CreateUserRequest) (*responses.User, error)
+	CreateProduct(ctx context.Context, input requests.CreateProductRequest) (*responses.Product, error)
+	UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (*responses.Product, error)
+	DeleteProduct(ctx context.Context, input requests.BindUriID) (*bool, error)
 }
 type QueryResolver interface {
-	GetUser(ctx context.Context, input models.URIID) (*models.User, error)
-	GetProduct(ctx context.Context, input models.URIID) (*models.Product, error)
+	GetUser(ctx context.Context, input requests.BindUriID) (*responses.User, error)
+	GetProduct(ctx context.Context, input requests.BindUriID) (*responses.Product, error)
+}
+type UserResolver interface {
+	Products(ctx context.Context, obj *responses.User, input requests.GetUserProductsRequest) (*responses.Products, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -35,10 +40,10 @@ type QueryResolver interface {
 func (ec *executionContext) field_Mutation_CreateProduct_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 models.NewProduct
+	var arg0 requests.CreateProductRequest
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewProduct2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐNewProduct(ctx, tmp)
+		arg0, err = ec.unmarshalNNewProduct2sqlcᚑrestᚑapiᚋrequestsᚐCreateProductRequest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -50,10 +55,10 @@ func (ec *executionContext) field_Mutation_CreateProduct_args(ctx context.Contex
 func (ec *executionContext) field_Mutation_CreateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 models.NewUser
+	var arg0 requests.CreateUserRequest
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewUser2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐNewUser(ctx, tmp)
+		arg0, err = ec.unmarshalNNewUser2sqlcᚑrestᚑapiᚋrequestsᚐCreateUserRequest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -65,10 +70,10 @@ func (ec *executionContext) field_Mutation_CreateUser_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_DeleteProduct_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 models.URIID
+	var arg0 requests.BindUriID
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUriID2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐURIID(ctx, tmp)
+		arg0, err = ec.unmarshalNUriID2sqlcᚑrestᚑapiᚋrequestsᚐBindUriID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -80,10 +85,10 @@ func (ec *executionContext) field_Mutation_DeleteProduct_args(ctx context.Contex
 func (ec *executionContext) field_Mutation_UpdateProduct_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 models.UpdateProduct
+	var arg0 requests.UpdateProductRequest
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateProduct2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐUpdateProduct(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdateProduct2sqlcᚑrestᚑapiᚋrequestsᚐUpdateProductRequest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -95,10 +100,10 @@ func (ec *executionContext) field_Mutation_UpdateProduct_args(ctx context.Contex
 func (ec *executionContext) field_Query_GetProduct_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 models.URIID
+	var arg0 requests.BindUriID
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUriID2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐURIID(ctx, tmp)
+		arg0, err = ec.unmarshalNUriID2sqlcᚑrestᚑapiᚋrequestsᚐBindUriID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -110,10 +115,10 @@ func (ec *executionContext) field_Query_GetProduct_args(ctx context.Context, raw
 func (ec *executionContext) field_Query_GetUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 models.URIID
+	var arg0 requests.BindUriID
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUriID2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐURIID(ctx, tmp)
+		arg0, err = ec.unmarshalNUriID2sqlcᚑrestᚑapiᚋrequestsᚐBindUriID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -140,10 +145,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_User_products_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 models.UserProducts
+	var arg0 requests.GetUserProductsRequest
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUserProducts2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐUserProducts(ctx, tmp)
+		arg0, err = ec.unmarshalNUserProducts2sqlcᚑrestᚑapiᚋrequestsᚐGetUserProductsRequest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -174,7 +179,7 @@ func (ec *executionContext) _Mutation_CreateUser(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateUser(rctx, fc.Args["input"].(models.NewUser))
+		return ec.resolvers.Mutation().CreateUser(rctx, fc.Args["input"].(requests.CreateUserRequest))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -185,9 +190,9 @@ func (ec *executionContext) _Mutation_CreateUser(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.User)
+	res := resTmp.(*responses.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖsqlcᚑrestᚑapiᚋgraphᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖsqlcᚑrestᚑapiᚋresponsesᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_CreateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -240,7 +245,7 @@ func (ec *executionContext) _Mutation_CreateProduct(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateProduct(rctx, fc.Args["input"].(models.NewProduct))
+		return ec.resolvers.Mutation().CreateProduct(rctx, fc.Args["input"].(requests.CreateProductRequest))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -251,9 +256,9 @@ func (ec *executionContext) _Mutation_CreateProduct(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.Product)
+	res := resTmp.(*responses.Product)
 	fc.Result = res
-	return ec.marshalNProduct2ᚖsqlcᚑrestᚑapiᚋgraphᚋmodelsᚐProduct(ctx, field.Selections, res)
+	return ec.marshalNProduct2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_CreateProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -308,7 +313,7 @@ func (ec *executionContext) _Mutation_UpdateProduct(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateProduct(rctx, fc.Args["input"].(models.UpdateProduct))
+		return ec.resolvers.Mutation().UpdateProduct(rctx, fc.Args["input"].(requests.UpdateProductRequest))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -319,9 +324,9 @@ func (ec *executionContext) _Mutation_UpdateProduct(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.Product)
+	res := resTmp.(*responses.Product)
 	fc.Result = res
-	return ec.marshalNProduct2ᚖsqlcᚑrestᚑapiᚋgraphᚋmodelsᚐProduct(ctx, field.Selections, res)
+	return ec.marshalNProduct2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_UpdateProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -376,7 +381,7 @@ func (ec *executionContext) _Mutation_DeleteProduct(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteProduct(rctx, fc.Args["input"].(models.URIID))
+		return ec.resolvers.Mutation().DeleteProduct(rctx, fc.Args["input"].(requests.BindUriID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -427,7 +432,7 @@ func (ec *executionContext) _Query_GetUser(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetUser(rctx, fc.Args["input"].(models.URIID))
+		return ec.resolvers.Query().GetUser(rctx, fc.Args["input"].(requests.BindUriID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -438,9 +443,9 @@ func (ec *executionContext) _Query_GetUser(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.User)
+	res := resTmp.(*responses.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖsqlcᚑrestᚑapiᚋgraphᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖsqlcᚑrestᚑapiᚋresponsesᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_GetUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -493,7 +498,7 @@ func (ec *executionContext) _Query_GetProduct(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetProduct(rctx, fc.Args["input"].(models.URIID))
+		return ec.resolvers.Query().GetProduct(rctx, fc.Args["input"].(requests.BindUriID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -504,9 +509,9 @@ func (ec *executionContext) _Query_GetProduct(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.Product)
+	res := resTmp.(*responses.Product)
 	fc.Result = res
-	return ec.marshalNProduct2ᚖsqlcᚑrestᚑapiᚋgraphᚋmodelsᚐProduct(ctx, field.Selections, res)
+	return ec.marshalNProduct2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_GetProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -674,7 +679,7 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *responses.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -718,7 +723,7 @@ func (ec *executionContext) fieldContext_User_id(ctx context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *responses.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -762,7 +767,7 @@ func (ec *executionContext) fieldContext_User_name(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *responses.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_email(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -806,7 +811,7 @@ func (ec *executionContext) fieldContext_User_email(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _User_created_at(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_created_at(ctx context.Context, field graphql.CollectedField, obj *responses.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_created_at(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -850,7 +855,7 @@ func (ec *executionContext) fieldContext_User_created_at(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _User_products(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_products(ctx context.Context, field graphql.CollectedField, obj *responses.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_products(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -864,7 +869,7 @@ func (ec *executionContext) _User_products(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Products, nil
+		return ec.resolvers.User().Products(rctx, obj, fc.Args["input"].(requests.GetUserProductsRequest))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -873,17 +878,17 @@ func (ec *executionContext) _User_products(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*models.Products)
+	res := resTmp.(*responses.Products)
 	fc.Result = res
-	return ec.marshalOProducts2ᚖsqlcᚑrestᚑapiᚋgraphᚋmodelsᚐProducts(ctx, field.Selections, res)
+	return ec.marshalOProducts2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProducts(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_products(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "edges":
@@ -912,8 +917,8 @@ func (ec *executionContext) fieldContext_User_products(ctx context.Context, fiel
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj interface{}) (models.NewUser, error) {
-	var it models.NewUser
+func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj interface{}) (requests.CreateUserRequest, error) {
+	var it requests.CreateUserRequest
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -948,8 +953,8 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUriID(ctx context.Context, obj interface{}) (models.URIID, error) {
-	var it models.URIID
+func (ec *executionContext) unmarshalInputUriID(ctx context.Context, obj interface{}) (requests.BindUriID, error) {
+	var it requests.BindUriID
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -976,8 +981,8 @@ func (ec *executionContext) unmarshalInputUriID(ctx context.Context, obj interfa
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUserProducts(ctx context.Context, obj interface{}) (models.UserProducts, error) {
-	var it models.UserProducts
+func (ec *executionContext) unmarshalInputUserProducts(ctx context.Context, obj interface{}) (requests.GetUserProductsRequest, error) {
+	var it requests.GetUserProductsRequest
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -1002,7 +1007,7 @@ func (ec *executionContext) unmarshalInputUserProducts(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-			it.First, err = ec.unmarshalNInt2int(ctx, v)
+			it.First, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1010,7 +1015,7 @@ func (ec *executionContext) unmarshalInputUserProducts(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-			it.After, err = ec.unmarshalNString2string(ctx, v)
+			it.After, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1158,7 +1163,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 
 var userImplementors = []string{"User"}
 
-func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *models.User) graphql.Marshaler {
+func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *responses.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
@@ -1171,33 +1176,46 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 
 			out.Values[i] = ec._User_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "email":
 
 			out.Values[i] = ec._User_email(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "created_at":
 
 			out.Values[i] = ec._User_created_at(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "products":
+			field := field
 
-			out.Values[i] = ec._User_products(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_products(ctx, field, obj)
+				return res
+			}
 
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -1213,7 +1231,7 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalNNewUser2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐNewUser(ctx context.Context, v interface{}) (models.NewUser, error) {
+func (ec *executionContext) unmarshalNNewUser2sqlcᚑrestᚑapiᚋrequestsᚐCreateUserRequest(ctx context.Context, v interface{}) (requests.CreateUserRequest, error) {
 	res, err := ec.unmarshalInputNewUser(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -1233,16 +1251,16 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalNUriID2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐURIID(ctx context.Context, v interface{}) (models.URIID, error) {
+func (ec *executionContext) unmarshalNUriID2sqlcᚑrestᚑapiᚋrequestsᚐBindUriID(ctx context.Context, v interface{}) (requests.BindUriID, error) {
 	res, err := ec.unmarshalInputUriID(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUser2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2sqlcᚑrestᚑapiᚋresponsesᚐUser(ctx context.Context, sel ast.SelectionSet, v responses.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚖsqlcᚑrestᚑapiᚋgraphᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖsqlcᚑrestᚑapiᚋresponsesᚐUser(ctx context.Context, sel ast.SelectionSet, v *responses.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -1252,7 +1270,7 @@ func (ec *executionContext) marshalNUser2ᚖsqlcᚑrestᚑapiᚋgraphᚋmodels�
 	return ec._User(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUserProducts2sqlcᚑrestᚑapiᚋgraphᚋmodelsᚐUserProducts(ctx context.Context, v interface{}) (models.UserProducts, error) {
+func (ec *executionContext) unmarshalNUserProducts2sqlcᚑrestᚑapiᚋrequestsᚐGetUserProductsRequest(ctx context.Context, v interface{}) (requests.GetUserProductsRequest, error) {
 	res, err := ec.unmarshalInputUserProducts(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }

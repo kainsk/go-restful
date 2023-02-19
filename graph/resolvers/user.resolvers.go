@@ -8,17 +8,23 @@ import (
 	"context"
 	"fmt"
 	"sqlc-rest-api/graph/generated"
-	"sqlc-rest-api/graph/models"
+	"sqlc-rest-api/requests"
+	"sqlc-rest-api/responses"
 )
 
 // CreateUser is the resolver for the CreateUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input requests.CreateUserRequest) (*responses.User, error) {
 	panic(fmt.Errorf("not implemented: CreateUser - CreateUser"))
 }
 
 // GetUser is the resolver for the GetUser field.
-func (r *queryResolver) GetUser(ctx context.Context, input models.URIID) (*models.User, error) {
+func (r *queryResolver) GetUser(ctx context.Context, input requests.BindUriID) (*responses.User, error) {
 	panic(fmt.Errorf("not implemented: GetUser - GetUser"))
+}
+
+// Products is the resolver for the products field.
+func (r *userResolver) Products(ctx context.Context, obj *responses.User, input requests.GetUserProductsRequest) (*responses.Products, error) {
+	panic(fmt.Errorf("not implemented: Products - products"))
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -27,5 +33,9 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// User returns generated.UserResolver implementation.
+func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

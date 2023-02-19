@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"sqlc-rest-api/graph/models"
+	"sqlc-rest-api/requests"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -31,7 +31,9 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Product() ProductResolver
 	Query() QueryResolver
+	User() UserResolver
 }
 
 type DirectiveRoot struct {
@@ -39,10 +41,10 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CreateProduct func(childComplexity int, input models.NewProduct) int
-		CreateUser    func(childComplexity int, input models.NewUser) int
-		DeleteProduct func(childComplexity int, input models.URIID) int
-		UpdateProduct func(childComplexity int, input models.UpdateProduct) int
+		CreateProduct func(childComplexity int, input requests.CreateProductRequest) int
+		CreateUser    func(childComplexity int, input requests.CreateUserRequest) int
+		DeleteProduct func(childComplexity int, input requests.BindUriID) int
+		UpdateProduct func(childComplexity int, input requests.UpdateProductRequest) int
 	}
 
 	PageInfo struct {
@@ -56,7 +58,7 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
 		Price     func(childComplexity int) int
-		User      func(childComplexity int) int
+		User      func(childComplexity int, input requests.BindUriID) int
 		UserID    func(childComplexity int) int
 	}
 
@@ -71,8 +73,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetProduct func(childComplexity int, input models.URIID) int
-		GetUser    func(childComplexity int, input models.URIID) int
+		GetProduct func(childComplexity int, input requests.BindUriID) int
+		GetUser    func(childComplexity int, input requests.BindUriID) int
 	}
 
 	User struct {
@@ -80,7 +82,7 @@ type ComplexityRoot struct {
 		Email     func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
-		Products  func(childComplexity int, input models.UserProducts) int
+		Products  func(childComplexity int, input requests.GetUserProductsRequest) int
 	}
 }
 
@@ -109,7 +111,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateProduct(childComplexity, args["input"].(models.NewProduct)), true
+		return e.complexity.Mutation.CreateProduct(childComplexity, args["input"].(requests.CreateProductRequest)), true
 
 	case "Mutation.CreateUser":
 		if e.complexity.Mutation.CreateUser == nil {
@@ -121,7 +123,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(models.NewUser)), true
+		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(requests.CreateUserRequest)), true
 
 	case "Mutation.DeleteProduct":
 		if e.complexity.Mutation.DeleteProduct == nil {
@@ -133,7 +135,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteProduct(childComplexity, args["input"].(models.URIID)), true
+		return e.complexity.Mutation.DeleteProduct(childComplexity, args["input"].(requests.BindUriID)), true
 
 	case "Mutation.UpdateProduct":
 		if e.complexity.Mutation.UpdateProduct == nil {
@@ -145,7 +147,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateProduct(childComplexity, args["input"].(models.UpdateProduct)), true
+		return e.complexity.Mutation.UpdateProduct(childComplexity, args["input"].(requests.UpdateProductRequest)), true
 
 	case "PageInfo.end_cursor":
 		if e.complexity.PageInfo.EndCursor == nil {
@@ -201,7 +203,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Product.User(childComplexity), true
+		args, err := ec.field_Product_user_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Product.User(childComplexity, args["input"].(requests.BindUriID)), true
 
 	case "Product.user_id":
 		if e.complexity.Product.UserID == nil {
@@ -248,7 +255,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetProduct(childComplexity, args["input"].(models.URIID)), true
+		return e.complexity.Query.GetProduct(childComplexity, args["input"].(requests.BindUriID)), true
 
 	case "Query.GetUser":
 		if e.complexity.Query.GetUser == nil {
@@ -260,7 +267,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetUser(childComplexity, args["input"].(models.URIID)), true
+		return e.complexity.Query.GetUser(childComplexity, args["input"].(requests.BindUriID)), true
 
 	case "User.created_at":
 		if e.complexity.User.CreatedAt == nil {
@@ -300,7 +307,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.User.Products(childComplexity, args["input"].(models.UserProducts)), true
+		return e.complexity.User.Products(childComplexity, args["input"].(requests.GetUserProductsRequest)), true
 
 	}
 	return 0, false
@@ -381,7 +388,7 @@ var sources = []*ast.Source{
     price: Int!
     user_id: ID!
     created_at: Time!
-    user: User!
+    user(input: UriID!): User!
 }
 
 type ProductEdge {
@@ -440,8 +447,8 @@ input UriID {
 
 input UserProducts {
     user_id: ID!
-    first: Int!
-    after: String!
+    first: Int
+    after: String
 }
 
 type Mutation {

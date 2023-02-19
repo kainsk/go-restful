@@ -6,9 +6,9 @@ exec:
   dir: graph/generated
   package: generated
 
-model:
-  filename: graph/models/models_gen.go
-  package: models
+# model:
+#   filename: graph/models/models_gen.go
+#   package: models
 
 resolver:
   layout: follow-schema
@@ -28,3 +28,31 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  
+  # binding
+  NewProduct:
+    model: sqlc-rest-api/requests.CreateProductRequest
+  Product:
+    model: sqlc-rest-api/responses.Product
+    fields:
+      user:
+        resolver: true
+  UpdateProduct:
+    model: sqlc-rest-api/requests.UpdateProductRequest
+  UriID:
+    model: sqlc-rest-api/requests.BindUriID
+  User:
+    model: sqlc-rest-api/responses.User
+    fields:
+      products:
+        resolver: true
+  NewUser:
+    model: sqlc-rest-api/requests.CreateUserRequest
+  PageInfo:
+    model: sqlc-rest-api/responses.PageInfo
+  ProductEdge:
+    model: sqlc-rest-api/responses.ProductEdge
+  Products:
+    model: sqlc-rest-api/responses.Products
+  UserProducts:
+    model: sqlc-rest-api/requests.GetUserProductsRequest

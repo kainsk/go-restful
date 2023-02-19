@@ -7,25 +7,37 @@ package resolvers
 import (
 	"context"
 	"fmt"
-	"sqlc-rest-api/graph/models"
+	"sqlc-rest-api/graph/generated"
+	"sqlc-rest-api/requests"
+	"sqlc-rest-api/responses"
 )
 
 // CreateProduct is the resolver for the CreateProduct field.
-func (r *mutationResolver) CreateProduct(ctx context.Context, input models.NewProduct) (*models.Product, error) {
+func (r *mutationResolver) CreateProduct(ctx context.Context, input requests.CreateProductRequest) (*responses.Product, error) {
 	panic(fmt.Errorf("not implemented: CreateProduct - CreateProduct"))
 }
 
 // UpdateProduct is the resolver for the UpdateProduct field.
-func (r *mutationResolver) UpdateProduct(ctx context.Context, input models.UpdateProduct) (*models.Product, error) {
+func (r *mutationResolver) UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (*responses.Product, error) {
 	panic(fmt.Errorf("not implemented: UpdateProduct - UpdateProduct"))
 }
 
 // DeleteProduct is the resolver for the DeleteProduct field.
-func (r *mutationResolver) DeleteProduct(ctx context.Context, input models.URIID) (*bool, error) {
+func (r *mutationResolver) DeleteProduct(ctx context.Context, input requests.BindUriID) (*bool, error) {
 	panic(fmt.Errorf("not implemented: DeleteProduct - DeleteProduct"))
 }
 
+// User is the resolver for the user field.
+func (r *productResolver) User(ctx context.Context, obj *responses.Product, input requests.BindUriID) (*responses.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
 // GetProduct is the resolver for the GetProduct field.
-func (r *queryResolver) GetProduct(ctx context.Context, input models.URIID) (*models.Product, error) {
+func (r *queryResolver) GetProduct(ctx context.Context, input requests.BindUriID) (*responses.Product, error) {
 	panic(fmt.Errorf("not implemented: GetProduct - GetProduct"))
 }
+
+// Product returns generated.ProductResolver implementation.
+func (r *Resolver) Product() generated.ProductResolver { return &productResolver{r} }
+
+type productResolver struct{ *Resolver }

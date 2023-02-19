@@ -110,7 +110,7 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 
 	products := responses.Products{
 		Edges:    edges,
-		PageInfo: pageInfo,
+		PageInfo: &pageInfo,
 	}
 
 	user := helpers.UserResponse(u)

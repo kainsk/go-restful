@@ -17,8 +17,8 @@ input UriID {
 
 input UserProducts {
     user_id: ID!
-    first: Int!
-    after: String!
+    first: Int
+    after: String
 }
 
 type Mutation {

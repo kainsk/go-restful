@@ -13,7 +13,7 @@ type Product struct {
 
 type Products struct {
 	Edges    []*ProductEdge `json:"edges"`
-	PageInfo PageInfo       `json:"page_info"`
+	PageInfo *PageInfo      `json:"page_info"`
 }
 
 type ProductEdge struct {

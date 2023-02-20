@@ -13,7 +13,7 @@ func SuccessResponse(message string, data any) responses.ApiResponse {
 	}
 }
 
-func ProductResponse(source any) responses.Product {
+func ProductResponse(source any) *responses.Product {
 	var product responses.Product
 	switch p := source.(type) {
 	case repositories.Product:
@@ -28,10 +28,10 @@ func ProductResponse(source any) responses.Product {
 		panic("incompatible source")
 	}
 
-	return product
+	return &product
 }
 
-func UserResponse(source any) responses.User {
+func UserResponse(source any) *responses.User {
 	var user responses.User
 	switch u := source.(type) {
 	case repositories.User:
@@ -45,5 +45,5 @@ func UserResponse(source any) responses.User {
 		panic("incompatible source")
 	}
 
-	return user
+	return &user
 }

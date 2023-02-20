@@ -13,12 +13,12 @@ import (
 )
 
 // CreateUser is the resolver for the CreateUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input requests.CreateUserRequest) (responses.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input requests.CreateUserRequest) (*responses.User, error) {
 	return r.Service.CreateUser(ctx, input)
 }
 
 // GetUser is the resolver for the GetUser field.
-func (r *queryResolver) GetUser(ctx context.Context, input requests.BindUriID) (responses.User, error) {
+func (r *queryResolver) GetUser(ctx context.Context, input requests.BindUriID) (*responses.User, error) {
 	return r.Service.GetUser(ctx, input)
 }
 

@@ -12,12 +12,12 @@ import (
 )
 
 // CreateProduct is the resolver for the CreateProduct field.
-func (r *mutationResolver) CreateProduct(ctx context.Context, input requests.CreateProductRequest) (responses.Product, error) {
+func (r *mutationResolver) CreateProduct(ctx context.Context, input requests.CreateProductRequest) (*responses.Product, error) {
 	return r.Service.CreateProduct(ctx, input)
 }
 
 // UpdateProduct is the resolver for the UpdateProduct field.
-func (r *mutationResolver) UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (responses.Product, error) {
+func (r *mutationResolver) UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (*responses.Product, error) {
 	return r.Service.UpdateProduct(ctx, input)
 }
 
@@ -32,7 +32,7 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, input requests.Bin
 }
 
 // User is the resolver for the user field.
-func (r *productResolver) User(ctx context.Context, obj *responses.Product, input *requests.BindUriID) (responses.User, error) {
+func (r *productResolver) User(ctx context.Context, obj *responses.Product, input *requests.BindUriID) (*responses.User, error) {
 	arg := requests.BindUriID{
 		ID: obj.UserID,
 	}
@@ -41,7 +41,7 @@ func (r *productResolver) User(ctx context.Context, obj *responses.Product, inpu
 }
 
 // GetProduct is the resolver for the GetProduct field.
-func (r *queryResolver) GetProduct(ctx context.Context, input requests.BindUriID) (responses.Product, error) {
+func (r *queryResolver) GetProduct(ctx context.Context, input requests.BindUriID) (*responses.Product, error) {
 	return r.Service.GetProduct(ctx, input)
 }
 

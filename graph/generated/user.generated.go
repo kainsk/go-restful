@@ -20,14 +20,14 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type MutationResolver interface {
-	CreateUser(ctx context.Context, input requests.CreateUserRequest) (responses.User, error)
-	CreateProduct(ctx context.Context, input requests.CreateProductRequest) (responses.Product, error)
-	UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (responses.Product, error)
+	CreateUser(ctx context.Context, input requests.CreateUserRequest) (*responses.User, error)
+	CreateProduct(ctx context.Context, input requests.CreateProductRequest) (*responses.Product, error)
+	UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (*responses.Product, error)
 	DeleteProduct(ctx context.Context, input requests.BindUriID) (*bool, error)
 }
 type QueryResolver interface {
-	GetUser(ctx context.Context, input requests.BindUriID) (responses.User, error)
-	GetProduct(ctx context.Context, input requests.BindUriID) (responses.Product, error)
+	GetUser(ctx context.Context, input requests.BindUriID) (*responses.User, error)
+	GetProduct(ctx context.Context, input requests.BindUriID) (*responses.Product, error)
 }
 type UserResolver interface {
 	Products(ctx context.Context, obj *responses.User, input requests.GetUserProductsRequest) (*responses.Products, error)
@@ -190,9 +190,9 @@ func (ec *executionContext) _Mutation_CreateUser(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(responses.User)
+	res := resTmp.(*responses.User)
 	fc.Result = res
-	return ec.marshalNUser2sqlcᚑrestᚑapiᚋresponsesᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖsqlcᚑrestᚑapiᚋresponsesᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_CreateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -256,9 +256,9 @@ func (ec *executionContext) _Mutation_CreateProduct(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(responses.Product)
+	res := resTmp.(*responses.Product)
 	fc.Result = res
-	return ec.marshalNProduct2sqlcᚑrestᚑapiᚋresponsesᚐProduct(ctx, field.Selections, res)
+	return ec.marshalNProduct2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_CreateProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -324,9 +324,9 @@ func (ec *executionContext) _Mutation_UpdateProduct(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(responses.Product)
+	res := resTmp.(*responses.Product)
 	fc.Result = res
-	return ec.marshalNProduct2sqlcᚑrestᚑapiᚋresponsesᚐProduct(ctx, field.Selections, res)
+	return ec.marshalNProduct2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_UpdateProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -443,9 +443,9 @@ func (ec *executionContext) _Query_GetUser(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(responses.User)
+	res := resTmp.(*responses.User)
 	fc.Result = res
-	return ec.marshalNUser2sqlcᚑrestᚑapiᚋresponsesᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖsqlcᚑrestᚑapiᚋresponsesᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_GetUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -509,9 +509,9 @@ func (ec *executionContext) _Query_GetProduct(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(responses.Product)
+	res := resTmp.(*responses.Product)
 	fc.Result = res
-	return ec.marshalNProduct2sqlcᚑrestᚑapiᚋresponsesᚐProduct(ctx, field.Selections, res)
+	return ec.marshalNProduct2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_GetProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1258,6 +1258,16 @@ func (ec *executionContext) unmarshalNUriID2sqlcᚑrestᚑapiᚋrequestsᚐBindU
 
 func (ec *executionContext) marshalNUser2sqlcᚑrestᚑapiᚋresponsesᚐUser(ctx context.Context, sel ast.SelectionSet, v responses.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUser2ᚖsqlcᚑrestᚑapiᚋresponsesᚐUser(ctx context.Context, sel ast.SelectionSet, v *responses.User) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._User(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUserProducts2sqlcᚑrestᚑapiᚋrequestsᚐGetUserProductsRequest(ctx context.Context, v interface{}) (requests.GetUserProductsRequest, error) {

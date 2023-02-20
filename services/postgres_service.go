@@ -24,7 +24,7 @@ func NewPostgresService(db *sql.DB, pqrepo repositories.Querier) *PostgresServic
 	}
 }
 
-func (pq *PostgresService) CreateProduct(ctx context.Context, req requests.CreateProductRequest) (responses.Product, error) {
+func (pq *PostgresService) CreateProduct(ctx context.Context, req requests.CreateProductRequest) (*responses.Product, error) {
 	arg := repositories.CreateProductParams{
 		UserID: req.UserID,
 		Name:   req.Name,
@@ -33,7 +33,7 @@ func (pq *PostgresService) CreateProduct(ctx context.Context, req requests.Creat
 
 	prod, err := pq.Repo.CreateProduct(ctx, pq.DB, arg)
 	if err != nil {
-		return responses.Product{}, err
+		return &responses.Product{}, err
 	}
 
 	return helpers.ProductResponse(prod), nil
@@ -48,19 +48,19 @@ func (pq *PostgresService) DeleteProduct(ctx context.Context, req requests.BindU
 	return pq.Repo.DeleteProduct(ctx, pq.DB, prod.ID)
 }
 
-func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriID) (responses.Product, error) {
+func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriID) (*responses.Product, error) {
 	prod, err := pq.Repo.GetProduct(ctx, pq.DB, req.ID)
 	if err != nil {
-		return responses.Product{}, fmt.Errorf("product with id %d not found", req.ID)
+		return &responses.Product{}, fmt.Errorf("product with id %d not found", req.ID)
 	}
 
 	return helpers.ProductResponse(prod), nil
 }
 
-func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (responses.User, error) {
+func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (*responses.User, error) {
 	u, err := pq.Repo.GetUser(ctx, pq.DB, req.UserID)
 	if err != nil {
-		return responses.User{}, fmt.Errorf("user with id %d not found", req.UserID)
+		return &responses.User{}, fmt.Errorf("user with id %d not found", req.UserID)
 	}
 
 	after := time.Now()
@@ -76,7 +76,7 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 
 	results, err := pq.Repo.GetUserProducts(ctx, pq.DB, arg)
 	if err != nil {
-		return responses.User{}, err
+		return &responses.User{}, err
 	}
 
 	if len(results) < 1 {
@@ -119,10 +119,10 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 	return user, nil
 }
 
-func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (responses.Product, error) {
+func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (*responses.Product, error) {
 	prod, err := pq.Repo.GetProduct(ctx, pq.DB, req.ID)
 	if err != nil {
-		return responses.Product{}, fmt.Errorf("product with id %d not found", req.ID)
+		return &responses.Product{}, fmt.Errorf("product with id %d not found", req.ID)
 	}
 
 	arg := repositories.UpdateProductParams{
@@ -133,13 +133,13 @@ func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.Updat
 
 	updated, err := pq.Repo.UpdateProduct(ctx, pq.DB, arg)
 	if err != nil {
-		return responses.Product{}, err
+		return &responses.Product{}, err
 	}
 
 	return helpers.ProductResponse(updated), nil
 }
 
-func (pq *PostgresService) CreateUser(ctx context.Context, req requests.CreateUserRequest) (responses.User, error) {
+func (pq *PostgresService) CreateUser(ctx context.Context, req requests.CreateUserRequest) (*responses.User, error) {
 	arg := repositories.CreateUserParams{
 		Name:  req.Name,
 		Email: req.Email,
@@ -147,16 +147,16 @@ func (pq *PostgresService) CreateUser(ctx context.Context, req requests.CreateUs
 
 	user, err := pq.Repo.CreateUser(ctx, pq.DB, arg)
 	if err != nil {
-		return responses.User{}, err
+		return &responses.User{}, err
 	}
 
 	return helpers.UserResponse(user), nil
 }
 
-func (pq *PostgresService) GetUser(ctx context.Context, req requests.BindUriID) (responses.User, error) {
+func (pq *PostgresService) GetUser(ctx context.Context, req requests.BindUriID) (*responses.User, error) {
 	user, err := pq.Repo.GetUser(ctx, pq.DB, req.ID)
 	if err != nil {
-		return responses.User{}, err
+		return &responses.User{}, err
 	}
 
 	return helpers.UserResponse(user), nil

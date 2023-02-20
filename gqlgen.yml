@@ -1,7 +1,7 @@
 schema:
 - graph/schemas/*.graphqls
 
-resolvers_always_return_pointers: false
+resolvers_always_return_pointers: true
 
 exec:
   layout: follow-schema

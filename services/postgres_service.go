@@ -76,10 +76,15 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 		after = helpers.DecodeCursor(*req.After)
 	}
 
+	first := 5
+	if req.First != nil {
+		first = *req.First
+	}
+
 	arg := repositories.GetUserProductsParams{
 		UserID: u.ID,
 		After:  sql.NullTime{Valid: true, Time: after},
-		First:  int32(*req.First),
+		First:  int32(first),
 	}
 
 	results, err := pq.Repo.GetUserProducts(ctx, pq.DB, arg)

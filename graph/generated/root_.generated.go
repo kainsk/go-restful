@@ -87,7 +87,7 @@ type ComplexityRoot struct {
 		Email     func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
-		Products  func(childComplexity int, input requests.GetUserProductsRequest) int
+		Products  func(childComplexity int, input *requests.GetUserProductsRequest) int
 	}
 }
 
@@ -326,7 +326,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.User.Products(childComplexity, args["input"].(requests.GetUserProductsRequest)), true
+		return e.complexity.User.Products(childComplexity, args["input"].(*requests.GetUserProductsRequest)), true
 
 	}
 	return 0, false
@@ -457,7 +457,7 @@ extend type Query {
     name: String!
     email: String!
     created_at: Time!
-    products(input: UserProducts!): Products 
+    products(input: UserProducts): Products! 
 }
 
 input NewUser {
@@ -470,7 +470,7 @@ input UriID {
 }
 
 input UserProducts {
-    user_id: ID!
+    user_id: ID
     first: Int
     after: String
 }

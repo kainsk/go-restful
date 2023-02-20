@@ -30,7 +30,7 @@ type QueryResolver interface {
 	GetProduct(ctx context.Context, input requests.BindUriID) (*responses.Product, error)
 }
 type UserResolver interface {
-	Products(ctx context.Context, obj *responses.User, input requests.GetUserProductsRequest) (*responses.Products, error)
+	Products(ctx context.Context, obj *responses.User, input *requests.GetUserProductsRequest) (*responses.Products, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -145,10 +145,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_User_products_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 requests.GetUserProductsRequest
+	var arg0 *requests.GetUserProductsRequest
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUserProducts2sqlcᚑrestᚑapiᚋrequestsᚐGetUserProductsRequest(ctx, tmp)
+		arg0, err = ec.unmarshalOUserProducts2ᚖsqlcᚑrestᚑapiᚋrequestsᚐGetUserProductsRequest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -878,18 +878,21 @@ func (ec *executionContext) _User_products(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Products(rctx, obj, fc.Args["input"].(requests.GetUserProductsRequest))
+		return ec.resolvers.User().Products(rctx, obj, fc.Args["input"].(*requests.GetUserProductsRequest))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(*responses.Products)
 	fc.Result = res
-	return ec.marshalOProducts2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProducts(ctx, field.Selections, res)
+	return ec.marshalNProducts2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProducts(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_products(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1008,7 +1011,7 @@ func (ec *executionContext) unmarshalInputUserProducts(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
-			it.UserID, err = ec.unmarshalNID2int64(ctx, v)
+			it.UserID, err = ec.unmarshalOID2int64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1218,6 +1221,9 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_products(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -1279,16 +1285,19 @@ func (ec *executionContext) marshalNUser2ᚖsqlcᚑrestᚑapiᚋresponsesᚐUser
 	return ec._User(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUserProducts2sqlcᚑrestᚑapiᚋrequestsᚐGetUserProductsRequest(ctx context.Context, v interface{}) (requests.GetUserProductsRequest, error) {
-	res, err := ec.unmarshalInputUserProducts(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalOUriID2ᚖsqlcᚑrestᚑapiᚋrequestsᚐBindUriID(ctx context.Context, v interface{}) (*requests.BindUriID, error) {
 	if v == nil {
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputUriID(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUserProducts2ᚖsqlcᚑrestᚑapiᚋrequestsᚐGetUserProductsRequest(ctx context.Context, v interface{}) (*requests.GetUserProductsRequest, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUserProducts(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

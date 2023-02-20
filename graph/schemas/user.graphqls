@@ -3,7 +3,7 @@ type User {
     name: String!
     email: String!
     created_at: Time!
-    products(input: UserProducts!): Products 
+    products(input: UserProducts): Products! 
 }
 
 input NewUser {
@@ -16,7 +16,7 @@ input UriID {
 }
 
 input UserProducts {
-    user_id: ID!
+    user_id: ID
     first: Int
     after: String
 }

@@ -1185,16 +1185,23 @@ func (ec *executionContext) marshalNProductEdge2ᚖsqlcᚑrestᚑapiᚋresponses
 	return ec._ProductEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateProduct2sqlcᚑrestᚑapiᚋrequestsᚐUpdateProductRequest(ctx context.Context, v interface{}) (requests.UpdateProductRequest, error) {
-	res, err := ec.unmarshalInputUpdateProduct(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
+func (ec *executionContext) marshalNProducts2sqlcᚑrestᚑapiᚋresponsesᚐProducts(ctx context.Context, sel ast.SelectionSet, v responses.Products) graphql.Marshaler {
+	return ec._Products(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOProducts2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProducts(ctx context.Context, sel ast.SelectionSet, v *responses.Products) graphql.Marshaler {
+func (ec *executionContext) marshalNProducts2ᚖsqlcᚑrestᚑapiᚋresponsesᚐProducts(ctx context.Context, sel ast.SelectionSet, v *responses.Products) graphql.Marshaler {
 	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
 		return graphql.Null
 	}
 	return ec._Products(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateProduct2sqlcᚑrestᚑapiᚋrequestsᚐUpdateProductRequest(ctx context.Context, v interface{}) (requests.UpdateProductRequest, error) {
+	res, err := ec.unmarshalInputUpdateProduct(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 // endregion ***************************** type.gotpl *****************************

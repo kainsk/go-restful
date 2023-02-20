@@ -6,7 +6,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 	"sqlc-rest-api/graph/generated"
 	"sqlc-rest-api/requests"
 	"sqlc-rest-api/responses"
@@ -23,8 +22,19 @@ func (r *queryResolver) GetUser(ctx context.Context, input requests.BindUriID) (
 }
 
 // Products is the resolver for the products field.
-func (r *userResolver) Products(ctx context.Context, obj *responses.User, input requests.GetUserProductsRequest) (*responses.Products, error) {
-	panic(fmt.Errorf("not implemented: Products - products"))
+func (r *userResolver) Products(ctx context.Context, obj *responses.User, input *requests.GetUserProductsRequest) (*responses.Products, error) {
+	first := 5
+	if input.First != nil {
+		first = *input.First
+	}
+
+	arg := requests.GetUserProductsRequest{
+		UserID: obj.ID,
+		First:  &first,
+		After:  input.After,
+	}
+
+	return r.Service.GetUserProducts(ctx, arg)
 }
 
 // Mutation returns generated.MutationResolver implementation.

@@ -24,6 +24,6 @@ func NewPageInfo(startCursor, endCursor string, hasNextPage bool) *responses.Pag
 	return &responses.PageInfo{
 		StartCursor: startCursor,
 		EndCursor:   endCursor,
-		HasNextPage: false,
+		HasNextPage: hasNextPage,
 	}
 }

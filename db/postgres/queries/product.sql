@@ -32,24 +32,16 @@ DELETE FROM products
 WHERE id = $1
 RETURNING id;
 
--- name: CountProductsByUserID :one
-SELECT COUNT(*) FROM products
-WHERE user_id = $1;
-
 -- name: GetUserProducts :many
-SELECT *,
-    EXISTS(
-        SELECT 1
-        FROM products AS pp
-        WHERE pp.user_id = sqlc.arg('user_id') AND pp.created_at < (
-            SELECT created_at
-            FROM products AS ppp
-            WHERE ppp.user_id = sqlc.arg('user_id') AND ppp.created_at < sqlc.arg('after')
-            ORDER BY created_at ASC
-            LIMIT 1
-        )       
-    )
-FROM products AS p
-WHERE p.user_id = sqlc.arg('user_id') AND p.created_at < sqlc.arg('after')
-ORDER BY p.created_at DESC
+SELECT *
+FROM products
+WHERE user_id = sqlc.arg('user_id') AND created_at < sqlc.arg('after')
+ORDER BY created_at DESC
 LIMIT sqlc.arg('first');
+
+-- name: UserProductsHasNextPage :one
+SELECT EXISTS(
+    SELECT 1
+    FROM products
+    WHERE user_id = sqlc.arg('user_id') AND created_at < sqlc.arg('after')
+);

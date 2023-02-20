@@ -10,18 +10,6 @@ import (
 	"database/sql"
 )
 
-const countProductsByUserID = `-- name: CountProductsByUserID :one
-SELECT COUNT(*) FROM products
-WHERE user_id = $1
-`
-
-func (q *Queries) CountProductsByUserID(ctx context.Context, db DBTX, userID int64) (int64, error) {
-	row := db.QueryRowContext(ctx, countProductsByUserID, userID)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
 const createProduct = `-- name: CreateProduct :one
 INSERT INTO products(
     user_id,
@@ -83,21 +71,10 @@ func (q *Queries) GetProduct(ctx context.Context, db DBTX, id int64) (Product, e
 }
 
 const getUserProducts = `-- name: GetUserProducts :many
-SELECT id, name, price, user_id, created_at,
-    EXISTS(
-        SELECT 1
-        FROM products AS pp
-        WHERE pp.user_id = $1 AND pp.created_at < (
-            SELECT created_at
-            FROM products AS ppp
-            WHERE ppp.user_id = $1 AND ppp.created_at < $2
-            ORDER BY created_at ASC
-            LIMIT 1
-        )       
-    )
-FROM products AS p
-WHERE p.user_id = $1 AND p.created_at < $2
-ORDER BY p.created_at DESC
+SELECT id, name, price, user_id, created_at
+FROM products
+WHERE user_id = $1 AND created_at < $2
+ORDER BY created_at DESC
 LIMIT $3
 `
 
@@ -107,31 +84,21 @@ type GetUserProductsParams struct {
 	First  int32        `json:"first"`
 }
 
-type GetUserProductsRow struct {
-	ID        int64        `json:"id"`
-	Name      string       `json:"name"`
-	Price     int64        `json:"price"`
-	UserID    int64        `json:"user_id"`
-	CreatedAt sql.NullTime `json:"created_at"`
-	Exists    bool         `json:"exists"`
-}
-
-func (q *Queries) GetUserProducts(ctx context.Context, db DBTX, arg GetUserProductsParams) ([]GetUserProductsRow, error) {
+func (q *Queries) GetUserProducts(ctx context.Context, db DBTX, arg GetUserProductsParams) ([]Product, error) {
 	rows, err := db.QueryContext(ctx, getUserProducts, arg.UserID, arg.After, arg.First)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetUserProductsRow
+	var items []Product
 	for rows.Next() {
-		var i GetUserProductsRow
+		var i Product
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.Price,
 			&i.UserID,
 			&i.CreatedAt,
-			&i.Exists,
 		); err != nil {
 			return nil, err
 		}
@@ -215,4 +182,24 @@ func (q *Queries) UpdateProduct(ctx context.Context, db DBTX, arg UpdateProductP
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const userProductsHasNextPage = `-- name: UserProductsHasNextPage :one
+SELECT EXISTS(
+    SELECT 1
+    FROM products
+    WHERE user_id = $1 AND created_at < $2
+)
+`
+
+type UserProductsHasNextPageParams struct {
+	UserID int64        `json:"user_id"`
+	After  sql.NullTime `json:"after"`
+}
+
+func (q *Queries) UserProductsHasNextPage(ctx context.Context, db DBTX, arg UserProductsHasNextPageParams) (bool, error) {
+	row := db.QueryRowContext(ctx, userProductsHasNextPage, arg.UserID, arg.After)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }

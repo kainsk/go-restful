@@ -99,10 +99,8 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 		}, nil
 	}
 
-	var hasNextPage bool
 	edges := make([]*responses.ProductEdge, len(results))
 	for i, result := range results {
-		hasNextPage = result.Exists
 		ds := result.CreatedAt.Time.String()
 		edges[i] = &responses.ProductEdge{
 			Cursor: base64.StdEncoding.EncodeToString([]byte(ds)),
@@ -116,12 +114,21 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 		}
 	}
 
+	hnpArg := repositories.UserProductsHasNextPageParams{
+		UserID: u.ID,
+		After:  sql.NullTime{Valid: true, Time: edges[len(edges)-1].Node.CreatedAt},
+	}
+
 	sc := base64.StdEncoding.EncodeToString([]byte(edges[0].Node.CreatedAt.String()))
 	ec := base64.StdEncoding.EncodeToString([]byte(edges[len(edges)-1].Node.CreatedAt.String()))
+	hnp, err := pq.Repo.UserProductsHasNextPage(ctx, pq.DB, hnpArg)
+	if err != nil {
+		return nil, err
+	}
 
 	products := responses.Products{
 		Edges:    edges,
-		PageInfo: helpers.NewPageInfo(sc, ec, hasNextPage),
+		PageInfo: helpers.NewPageInfo(sc, ec, hnp),
 	}
 
 	return &products, nil

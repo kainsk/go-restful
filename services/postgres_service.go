@@ -39,13 +39,21 @@ func (pq *PostgresService) CreateProduct(ctx context.Context, req requests.Creat
 	return helpers.ProductResponse(prod), nil
 }
 
-func (pq *PostgresService) DeleteProduct(ctx context.Context, req requests.BindUriID) error {
+func (pq *PostgresService) DeleteProduct(ctx context.Context, req requests.BindUriID) (*responses.DeletedProduct, error) {
 	prod, err := pq.Repo.GetProduct(ctx, pq.DB, req.ID)
 	if err != nil {
-		return fmt.Errorf("product with id %d not found", req.ID)
+		return nil, fmt.Errorf("product with id %d not found", req.ID)
 	}
 
-	return pq.Repo.DeleteProduct(ctx, pq.DB, prod.ID)
+	id, err := pq.Repo.DeleteProduct(ctx, pq.DB, prod.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responses.DeletedProduct{
+		Deleted:   true,
+		ProductID: id,
+	}, nil
 }
 
 func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriID) (*responses.Product, error) {

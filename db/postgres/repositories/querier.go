@@ -12,7 +12,7 @@ type Querier interface {
 	CountProductsByUserID(ctx context.Context, db DBTX, userID int64) (int64, error)
 	CreateProduct(ctx context.Context, db DBTX, arg CreateProductParams) (Product, error)
 	CreateUser(ctx context.Context, db DBTX, arg CreateUserParams) (User, error)
-	DeleteProduct(ctx context.Context, db DBTX, id int64) error
+	DeleteProduct(ctx context.Context, db DBTX, id int64) (int64, error)
 	GetBatchUsers(ctx context.Context, db DBTX, ids []int64) ([]User, error)
 	GetProduct(ctx context.Context, db DBTX, id int64) (Product, error)
 	GetUser(ctx context.Context, db DBTX, id int64) (User, error)

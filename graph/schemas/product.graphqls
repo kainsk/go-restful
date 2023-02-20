@@ -17,6 +17,11 @@ type Products {
     page_info: PageInfo!
 }
 
+type DeletedProduct {
+    deleted: Boolean!
+    product_id: ID!
+}
+
 type PageInfo {
     start_cursor: String!
     end_cursor: String!
@@ -38,7 +43,7 @@ input UpdateProduct {
 extend type Mutation {
     CreateProduct(input: NewProduct!): Product!
     UpdateProduct(input: UpdateProduct!): Product!
-    DeleteProduct(input: UriID!): Boolean
+    DeleteProduct(input: UriID!): DeletedProduct!
 }
 
 extend type Query {

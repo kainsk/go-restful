@@ -8,7 +8,7 @@ import (
 
 type Service interface {
 	CreateProduct(ctx context.Context, req requests.CreateProductRequest) (*responses.Product, error)
-	DeleteProduct(ctx context.Context, req requests.BindUriID) error
+	DeleteProduct(ctx context.Context, req requests.BindUriID) (*responses.DeletedProduct, error)
 	GetProduct(ctx context.Context, req requests.BindUriID) (*responses.Product, error)
 	UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (*responses.Product, error)
 	CreateUser(ctx context.Context, req requests.CreateUserRequest) (*responses.User, error)

@@ -23,7 +23,7 @@ type MutationResolver interface {
 	CreateUser(ctx context.Context, input requests.CreateUserRequest) (*responses.User, error)
 	CreateProduct(ctx context.Context, input requests.CreateProductRequest) (*responses.Product, error)
 	UpdateProduct(ctx context.Context, input requests.UpdateProductRequest) (*responses.Product, error)
-	DeleteProduct(ctx context.Context, input requests.BindUriID) (*bool, error)
+	DeleteProduct(ctx context.Context, input requests.BindUriID) (*responses.DeletedProduct, error)
 }
 type QueryResolver interface {
 	GetUser(ctx context.Context, input requests.BindUriID) (*responses.User, error)
@@ -387,11 +387,14 @@ func (ec *executionContext) _Mutation_DeleteProduct(ctx context.Context, field g
 		ec.Error(ctx, err)
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(*responses.DeletedProduct)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNDeletedProduct2ᚖsqlcᚑrestᚑapiᚋresponsesᚐDeletedProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_DeleteProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -401,7 +404,13 @@ func (ec *executionContext) fieldContext_Mutation_DeleteProduct(ctx context.Cont
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "deleted":
+				return ec.fieldContext_DeletedProduct_deleted(ctx, field)
+			case "product_id":
+				return ec.fieldContext_DeletedProduct_product_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeletedProduct", field.Name)
 		},
 	}
 	defer func() {

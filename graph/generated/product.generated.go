@@ -50,6 +50,94 @@ func (ec *executionContext) field_Product_user_args(ctx context.Context, rawArgs
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _DeletedProduct_deleted(ctx context.Context, field graphql.CollectedField, obj *responses.DeletedProduct) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeletedProduct_deleted(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deleted, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeletedProduct_deleted(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeletedProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeletedProduct_product_id(ctx context.Context, field graphql.CollectedField, obj *responses.DeletedProduct) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeletedProduct_product_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProductID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeletedProduct_product_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeletedProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _PageInfo_start_cursor(ctx context.Context, field graphql.CollectedField, obj *responses.PageInfo) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PageInfo_start_cursor(ctx, field)
 	if err != nil {
@@ -773,6 +861,41 @@ func (ec *executionContext) unmarshalInputUpdateProduct(ctx context.Context, obj
 
 // region    **************************** object.gotpl ****************************
 
+var deletedProductImplementors = []string{"DeletedProduct"}
+
+func (ec *executionContext) _DeletedProduct(ctx context.Context, sel ast.SelectionSet, obj *responses.DeletedProduct) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deletedProductImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeletedProduct")
+		case "deleted":
+
+			out.Values[i] = ec._DeletedProduct_deleted(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "product_id":
+
+			out.Values[i] = ec._DeletedProduct_product_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var pageInfoImplementors = []string{"PageInfo"}
 
 func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet, obj *responses.PageInfo) graphql.Marshaler {
@@ -964,6 +1087,20 @@ func (ec *executionContext) _Products(ctx context.Context, sel ast.SelectionSet,
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) marshalNDeletedProduct2sqlcᚑrestᚑapiᚋresponsesᚐDeletedProduct(ctx context.Context, sel ast.SelectionSet, v responses.DeletedProduct) graphql.Marshaler {
+	return ec._DeletedProduct(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeletedProduct2ᚖsqlcᚑrestᚑapiᚋresponsesᚐDeletedProduct(ctx context.Context, sel ast.SelectionSet, v *responses.DeletedProduct) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeletedProduct(ctx, sel, v)
+}
 
 func (ec *executionContext) unmarshalNNewProduct2sqlcᚑrestᚑapiᚋrequestsᚐCreateProductRequest(ctx context.Context, v interface{}) (requests.CreateProductRequest, error) {
 	res, err := ec.unmarshalInputNewProduct(ctx, v)

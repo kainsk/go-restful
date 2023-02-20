@@ -20,3 +20,8 @@ type ProductEdge struct {
 	Cursor string   `json:"cursor"`
 	Node   *Product `json:"node"`
 }
+
+type DeletedProduct struct {
+	Deleted   bool  `json:"deleted"`
+	ProductID int64 `json:"product_id"`
+}

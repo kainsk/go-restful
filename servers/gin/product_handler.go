@@ -41,7 +41,7 @@ func (gs *GinServer) DeleteProduct(c *gin.Context) {
 		return
 	}
 
-	err := gs.Service.DeleteProduct(c, req)
+	deletedProduct, err := gs.Service.DeleteProduct(c, req)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": err.Error(),
@@ -49,7 +49,11 @@ func (gs *GinServer) DeleteProduct(c *gin.Context) {
 		return
 	}
 
-	resp := helpers.SuccessResponse("product deleted successfully", nil)
+	data := gin.H{
+		"product": deletedProduct,
+	}
+
+	resp := helpers.SuccessResponse("product deleted successfully", data)
 	c.JSON(200, resp)
 }
 

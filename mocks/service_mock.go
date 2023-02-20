@@ -67,11 +67,12 @@ func (mr *MockServiceMockRecorder) CreateUser(ctx, req interface{}) *gomock.Call
 }
 
 // DeleteProduct mocks base method.
-func (m *MockService) DeleteProduct(ctx context.Context, req requests.BindUriID) error {
+func (m *MockService) DeleteProduct(ctx context.Context, req requests.BindUriID) (*responses.DeletedProduct, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteProduct", ctx, req)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*responses.DeletedProduct)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DeleteProduct indicates an expected call of DeleteProduct.

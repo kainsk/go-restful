@@ -55,8 +55,10 @@ func TestUpdateProduct(t *testing.T) {
 
 func TestDeleteProduct(t *testing.T) {
 	prod := createNewProduct(t)
-	err := testRepo.DeleteProduct(context.Background(), testDB, prod.ID)
+	deleted, err := testRepo.DeleteProduct(context.Background(), testDB, prod.ID)
 	require.NoError(t, err)
+	require.Equal(t, prod.ID, deleted.ID)
+	require.Equal(t, prod.UserID, deleted.UserID)
 }
 
 func createNewProduct(t *testing.T) Product {

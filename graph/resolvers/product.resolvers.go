@@ -22,13 +22,8 @@ func (r *mutationResolver) UpdateProduct(ctx context.Context, input requests.Upd
 }
 
 // DeleteProduct is the resolver for the DeleteProduct field.
-func (r *mutationResolver) DeleteProduct(ctx context.Context, input requests.BindUriID) (*bool, error) {
-	err := r.Service.DeleteProduct(ctx, input)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, nil
+func (r *mutationResolver) DeleteProduct(ctx context.Context, input requests.BindUriID) (*responses.DeletedProduct, error) {
+	return r.Service.DeleteProduct(ctx, input)
 }
 
 // User is the resolver for the user field.

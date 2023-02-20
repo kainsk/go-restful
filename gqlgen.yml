@@ -58,3 +58,5 @@ models:
     model: sqlc-rest-api/responses.Products
   UserProducts:
     model: sqlc-rest-api/requests.GetUserProductsRequest
+  DeletedProduct:
+    model: sqlc-rest-api/responses.DeletedProduct

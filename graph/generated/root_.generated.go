@@ -40,6 +40,11 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	DeletedProduct struct {
+		Deleted   func(childComplexity int) int
+		ProductID func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateProduct func(childComplexity int, input requests.CreateProductRequest) int
 		CreateUser    func(childComplexity int, input requests.CreateUserRequest) int
@@ -100,6 +105,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "DeletedProduct.deleted":
+		if e.complexity.DeletedProduct.Deleted == nil {
+			break
+		}
+
+		return e.complexity.DeletedProduct.Deleted(childComplexity), true
+
+	case "DeletedProduct.product_id":
+		if e.complexity.DeletedProduct.ProductID == nil {
+			break
+		}
+
+		return e.complexity.DeletedProduct.ProductID(childComplexity), true
 
 	case "Mutation.CreateProduct":
 		if e.complexity.Mutation.CreateProduct == nil {
@@ -401,6 +420,11 @@ type Products {
     page_info: PageInfo!
 }
 
+type DeletedProduct {
+    deleted: Boolean!
+    product_id: ID!
+}
+
 type PageInfo {
     start_cursor: String!
     end_cursor: String!
@@ -422,7 +446,7 @@ input UpdateProduct {
 extend type Mutation {
     CreateProduct(input: NewProduct!): Product!
     UpdateProduct(input: UpdateProduct!): Product!
-    DeleteProduct(input: UriID!): Boolean
+    DeleteProduct(input: UriID!): DeletedProduct!
 }
 
 extend type Query {

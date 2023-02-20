@@ -27,9 +27,10 @@ SET
 WHERE id = $1
 RETURNING *;
 
--- name: DeleteProduct :exec
+-- name: DeleteProduct :one
 DELETE FROM products
-WHERE id = $1;
+WHERE id = $1
+RETURNING id;
 
 -- name: CountProductsByUserID :one
 SELECT COUNT(*) FROM products

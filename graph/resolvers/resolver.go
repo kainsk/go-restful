@@ -9,3 +9,9 @@ import "sqlc-rest-api/services"
 type Resolver struct {
 	Service services.Service
 }
+
+func NewResolver(service services.Service) *Resolver {
+	return &Resolver{
+		Service: service,
+	}
+}

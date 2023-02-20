@@ -5,20 +5,23 @@ import (
 	"sqlc-rest-api/config"
 	"sqlc-rest-api/services"
 
+	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/gin-gonic/gin"
 )
 
 type GinServer struct {
 	Service services.Service
 	Engine  *gin.Engine
+	Graph   *handler.Server
 	Env     config.Environment
 }
 
-func NewGinServer(service services.Service, env config.Environment) (*GinServer, error) {
+func NewGinServer(service services.Service, env config.Environment, graph *handler.Server) (*GinServer, error) {
 	gs := &GinServer{
 		Service: service,
 		Env:     env,
 		Engine:  gin.Default(),
+		Graph:   graph,
 	}
 
 	gs.setupRoutes()

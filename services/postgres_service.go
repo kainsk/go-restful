@@ -65,10 +65,10 @@ func (pq *PostgresService) GetProduct(ctx context.Context, req requests.BindUriI
 	return helpers.ProductResponse(prod), nil
 }
 
-func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (*responses.User, error) {
+func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (*responses.Products, error) {
 	u, err := pq.Repo.GetUser(ctx, pq.DB, req.UserID)
 	if err != nil {
-		return &responses.User{}, fmt.Errorf("user with id %d not found", req.UserID)
+		return nil, fmt.Errorf("user with id %d not found", req.UserID)
 	}
 
 	after := time.Now()
@@ -77,20 +77,21 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 	}
 
 	arg := repositories.GetUserProductsParams{
-		UserID: req.UserID,
+		UserID: u.ID,
 		After:  sql.NullTime{Valid: true, Time: after},
 		First:  int32(*req.First),
 	}
 
 	results, err := pq.Repo.GetUserProducts(ctx, pq.DB, arg)
 	if err != nil {
-		return &responses.User{}, err
+		return nil, err
 	}
 
 	if len(results) < 1 {
-		user := helpers.UserResponse(u)
-		user.Products = &responses.Products{}
-		return user, nil
+		return &responses.Products{
+			Edges:    []*responses.ProductEdge{},
+			PageInfo: helpers.NewPageInfo("", "", false),
+		}, nil
 	}
 
 	var hasNextPage bool
@@ -110,21 +111,15 @@ func (pq *PostgresService) GetUserProducts(ctx context.Context, req requests.Get
 		}
 	}
 
-	pageInfo := responses.PageInfo{
-		StartCursor: base64.StdEncoding.EncodeToString([]byte(edges[0].Node.CreatedAt.String())),
-		EndCursor:   base64.StdEncoding.EncodeToString([]byte(edges[len(edges)-1].Node.CreatedAt.String())),
-		HasNextPage: hasNextPage,
-	}
+	sc := base64.StdEncoding.EncodeToString([]byte(edges[0].Node.CreatedAt.String()))
+	ec := base64.StdEncoding.EncodeToString([]byte(edges[len(edges)-1].Node.CreatedAt.String()))
 
 	products := responses.Products{
 		Edges:    edges,
-		PageInfo: &pageInfo,
+		PageInfo: helpers.NewPageInfo(sc, ec, hasNextPage),
 	}
 
-	user := helpers.UserResponse(u)
-	user.Products = &products
-
-	return user, nil
+	return &products, nil
 }
 
 func (pq *PostgresService) UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (*responses.Product, error) {

@@ -101,7 +101,7 @@ func (gs *GinServer) GetUserProducts(c *gin.Context) {
 	}
 
 	req.UserID = uri.ID
-	user, err := gs.Service.GetUserProducts(c, req)
+	products, err := gs.Service.GetUserProducts(c, req)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": err.Error(),
@@ -110,7 +110,7 @@ func (gs *GinServer) GetUserProducts(c *gin.Context) {
 	}
 
 	data := gin.H{
-		"user": user,
+		"products": products,
 	}
 
 	resp := helpers.SuccessResponse("list user products successfully", data)

@@ -13,5 +13,5 @@ type Service interface {
 	UpdateProduct(ctx context.Context, req requests.UpdateProductRequest) (*responses.Product, error)
 	CreateUser(ctx context.Context, req requests.CreateUserRequest) (*responses.User, error)
 	GetUser(ctx context.Context, req requests.BindUriID) (*responses.User, error)
-	GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (*responses.User, error)
+	GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (*responses.Products, error)
 }

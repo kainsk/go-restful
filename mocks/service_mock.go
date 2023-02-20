@@ -112,10 +112,10 @@ func (mr *MockServiceMockRecorder) GetUser(ctx, req interface{}) *gomock.Call {
 }
 
 // GetUserProducts mocks base method.
-func (m *MockService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (*responses.User, error) {
+func (m *MockService) GetUserProducts(ctx context.Context, req requests.GetUserProductsRequest) (*responses.Products, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserProducts", ctx, req)
-	ret0, _ := ret[0].(*responses.User)
+	ret0, _ := ret[0].(*responses.Products)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

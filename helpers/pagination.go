@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"encoding/base64"
+	"sqlc-rest-api/responses"
 	"time"
 )
 
@@ -17,4 +18,12 @@ func DecodeCursor(cursor string) time.Time {
 	}
 
 	return timestamp
+}
+
+func NewPageInfo(startCursor, endCursor string, hasNextPage bool) *responses.PageInfo {
+	return &responses.PageInfo{
+		StartCursor: startCursor,
+		EndCursor:   endCursor,
+		HasNextPage: false,
+	}
 }

@@ -23,15 +23,21 @@ func (r *queryResolver) GetUser(ctx context.Context, input requests.BindUriID) (
 
 // Products is the resolver for the products field.
 func (r *userResolver) Products(ctx context.Context, obj *responses.User, input *requests.GetUserProductsRequest) (*responses.Products, error) {
+	var after *string
 	first := 5
-	if input.First != nil {
-		first = *input.First
+	if input != nil {
+		if input.First != nil {
+			first = 5
+		}
+		if input.After != nil {
+			after = input.After
+		}
 	}
 
 	arg := requests.GetUserProductsRequest{
 		UserID: obj.ID,
 		First:  &first,
-		After:  input.After,
+		After:  after,
 	}
 
 	return r.Service.GetUserProducts(ctx, arg)

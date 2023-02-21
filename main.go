@@ -10,6 +10,7 @@ import (
 	gs "sqlc-rest-api/servers/gin"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,6 +33,7 @@ func main() {
 		generated.NewExecutableSchema(config.GraphConfig(service)),
 	)
 
+	graph.Use(extension.FixedComplexityLimit(env.ComplexityLimit))
 	ginserver, err := gs.NewGinServer(service, env, graph)
 	if err != nil {
 		logger.Fatal("Failed to create server :", err)

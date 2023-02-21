@@ -12,6 +12,8 @@ type Environment struct {
 
 	ServerHost string `mapstructure:"SERVER_HOST"`
 	ServerPort string `mapstructure:"SERVER_PORT"`
+
+	ComplexityLimit int `mapstructure:"COMPLEXITY_LIMIT"`
 }
 
 func LoadEnv(path, envName string) (env Environment, err error) {

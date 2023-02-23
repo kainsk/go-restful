@@ -7,6 +7,7 @@ import (
 	"sqlc-rest-api/graph/generated"
 	"sqlc-rest-api/services"
 
+	graphconfig "sqlc-rest-api/graph/config"
 	gs "sqlc-rest-api/servers/gin"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -30,7 +31,7 @@ func main() {
 	pqRepo := repositories.New()
 	service := services.NewPostgresService(db, pqRepo)
 	graph := handler.NewDefaultServer(
-		generated.NewExecutableSchema(config.GraphConfig(service)),
+		generated.NewExecutableSchema(graphconfig.GraphConfig(service)),
 	)
 
 	graph.Use(extension.FixedComplexityLimit(env.ComplexityLimit))

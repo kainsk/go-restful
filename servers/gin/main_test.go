@@ -3,6 +3,7 @@ package ginserver
 import (
 	"os"
 	"sqlc-rest-api/config"
+	graphconfig "sqlc-rest-api/graph/config"
 	"sqlc-rest-api/graph/generated"
 	"sqlc-rest-api/services"
 	"testing"
@@ -15,7 +16,7 @@ import (
 
 func newGinTestServer(t *testing.T, service services.Service) *GinServer {
 	graph := handler.NewDefaultServer(generated.NewExecutableSchema(
-		config.GraphConfig(service),
+		graphconfig.GraphConfig(service),
 	))
 
 	env := config.Environment{ComplexityLimit: 100}
